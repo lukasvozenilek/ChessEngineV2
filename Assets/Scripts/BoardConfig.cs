@@ -5,9 +5,13 @@ namespace DefaultNamespace
     [CreateAssetMenu(fileName = "Board Config", menuName = "NEW BOARD CONFIG", order = 0)]
     public class BoardConfig : ScriptableObject
     {
-        [Header("Misc")]
+        [Header("Colors")]
         public Color whiteColor;
         public Color blackColor;
+
+        [Header("Audio")] 
+        public AudioClip captureSound;
+        public AudioClip moveSound;
 
         [Header("White Pieces")]
         public Sprite whiteKing;

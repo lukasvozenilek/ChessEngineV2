@@ -26,9 +26,13 @@ public static class Board
 
     public static void LoadPositionFromFEN(string fen)
     {
+        //First, clear board
+        for (int i = 0; i < 64; i++) Squares[i] = Piece.None;
+        
         int boardpos = 56;
         foreach (char item in fen)
         {
+            if (item == ' ') break;
             if (item == '/')
             {
                 boardpos = 8 * (((int)boardpos/8)-2);
@@ -46,7 +50,6 @@ public static class Board
                     pieceid += FENPieceNames[char.ToLower(item)];
                     Squares[boardpos] = pieceid;
                     boardpos++;
-                    if (boardpos == 8) break;
                 }
             }
         }

@@ -16,10 +16,16 @@ public class ChessBoard : MonoBehaviour
 
     public List<GameObject> pieces = new List<GameObject>();
 
+    private AudioSource audioSource;
+    
     void Start()
     {
         GameState.MainCamera = Camera.main;
         print(Board.Squares[0]);
+
+        audioSource = GetComponent<AudioSource>();
+        
+        Board.LoadPositionFromFEN("8/8/pk6/8/3P4/1pn1N1R1/2r2R2/5K2 b - - 0 1");
 
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
