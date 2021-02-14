@@ -16,7 +16,7 @@ public class ChessBoard : MonoBehaviour
 
     public List<GameObject> pieces = new List<GameObject>();
 
-    private AudioSource audioSource;
+    public AudioSource audioSource;
     
     void Start()
     {
@@ -24,8 +24,6 @@ public class ChessBoard : MonoBehaviour
         print(Board.Squares[0]);
 
         audioSource = GetComponent<AudioSource>();
-        
-        Board.LoadPositionFromFEN("8/8/pk6/8/3P4/1pn1N1R1/2r2R2/5K2 b - - 0 1");
 
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
@@ -51,7 +49,7 @@ public class ChessBoard : MonoBehaviour
                 spawnpos.z = -1;
                 GO.transform.position = spawnpos;
 
-                pieceGO.startPos = GO.transform.position;
+                pieceGO.startSquare = pos;
                 pieceGO.chessBoardComponent = this;
                 
                 //Set piece sprite
@@ -109,23 +107,4 @@ public class ChessBoard : MonoBehaviour
         pieces.Clear();
     }
     
-    void Update()
-    {
-        
-    }
-    
-    private void OnMouseDrag()
-    {
-        
-    }    
-
-    private void OnMouseDown()
-    {
-        print(grid.WorldToCell(GameState.MainCamera.ScreenToWorldPoint(Input.mousePosition)));
-    }
-
-    private void OnMouseUp()
-    {
-        
-    }
 }

@@ -6,7 +6,7 @@ public class PieceGO : MonoBehaviour
     public SpriteRenderer pieceImage;
     public ChessBoard chessBoardComponent;
 
-    public Vector3 startPos;
+    public int startSquare;
 
     public void OnMouseDrag()
     {
@@ -22,6 +22,20 @@ public class PieceGO : MonoBehaviour
 
     public void OnMouseUp()
     {
-        if (transform.position != startPos) chessBoardComponent.UpdateBoard();
+        Vector3 destinationPos = chessBoardComponent.grid.WorldToCell(GameState.MainCamera.ScreenToWorldPoint(Input.mousePosition));
+        int destinationSquare = (int) (destinationPos.x) + ((int) destinationPos.y * 8);
+
+        if (destinationPos.x >= 0 && destinationPos.x <= 7 && destinationPos.y >= 0 && destinationPos.y <= 7 && destinationSquare != startSquare)
+        {
+            Board.Squares[destinationSquare] = Board.Squares[startSquare];
+            Board.Squares[startSquare] = Piece.None;
+            chessBoardComponent.UpdateBoard();
+            chessBoardComponent.audioSource.PlayOneShot(chessBoardComponent.boardConfig.moveSound);
+        }
+        else
+        {
+            //If target square is not valid, skip board back.
+            chessBoardComponent.UpdateBoard();
+        }
     }
 }

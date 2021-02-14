@@ -15,10 +15,10 @@
       <list>
         <option value="$PROJECT_DIR$/Assets/Scripts/GameState.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/BoardConfig.cs" />
-        <option value="$PROJECT_DIR$/Assets/ChessBoard.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
+        <option value="$PROJECT_DIR$/Assets/ChessBoard.cs" />
       </list>
     </option>
   </component>
@@ -63,6 +63,7 @@
       <updated>1613282328831</updated>
       <workItem from="1613282347230" duration="8240000" />
       <workItem from="1613292768635" duration="682000" />
+      <workItem from="1613298531002" duration="1078000" />
     </task>
     <servers />
   </component>
