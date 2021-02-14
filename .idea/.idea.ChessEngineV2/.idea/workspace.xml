@@ -13,13 +13,13 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/BoardConfig.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/GameState.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/CameraController.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/GameState.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
         <option value="$PROJECT_DIR$/Assets/ChessBoard.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
       </list>
     </option>
   </component>
@@ -65,7 +65,7 @@
       <workItem from="1613282347230" duration="8240000" />
       <workItem from="1613292768635" duration="682000" />
       <workItem from="1613298531002" duration="1318000" />
-      <workItem from="1613327708373" duration="2309000" />
+      <workItem from="1613327708373" duration="13814000" />
     </task>
     <servers />
   </component>
@@ -78,9 +78,9 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="943" y="235" key="search.everywhere.popup" timestamp="1613285676969">
+    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1613341888684">
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
-    <state x="943" y="235" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613285676969" />
+    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613341888684" />
   </component>
 </project>

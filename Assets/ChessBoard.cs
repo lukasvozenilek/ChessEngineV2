@@ -5,6 +5,10 @@ using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+/// <summary>
+/// ChessBoard.cs is responsible for the graphical representation of the board. It manages updating the piece objects from the static board
+/// state as well as flipping pieces for black's perspective.
+/// </summary>
 public class ChessBoard : MonoBehaviour
 {
     public BoardConfig boardConfig;
@@ -20,8 +24,6 @@ public class ChessBoard : MonoBehaviour
     
     public AudioSource audioSource;
 
-    
-    
     void Start()
     {
         GameState.MainCamera = Camera.main;
@@ -31,14 +33,23 @@ public class ChessBoard : MonoBehaviour
 
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
+        
         UpdateBoard();
         //CreateOverlayFromBB(Board.BB_ALL);
+
+        GameState.UpdateBoardEvent += UpdateBoard;
+    }
+
+    private void OnDestroy()
+    {
+        GameState.UpdateBoardEvent -= UpdateBoard;
     }
 
 
     public void UpdateBoard()
     {
         ClearBoard();
+        ClearOverlays();
         int pos = 0;
         foreach (int piece in Board.Squares)
         {
@@ -56,12 +67,11 @@ public class ChessBoard : MonoBehaviour
 
                 pieceGO.startSquare = pos;
                 pieceGO.chessBoardComponent = this;
-
-                Vector3 startScale = pieceGO.transform.localScale;
-                pieceGO.transform.localScale = new Vector3(startScale.x, GameState.BlackPerspective ? -1 : 1, startScale.z);
+                
+                //Flip piece if in black perspective
+                pieceGO.transform.localScale = GameState.BlackPerspective ? new Vector3(-1, -1, 1) : new Vector3(1, 1, 1);
                 
                 //Set piece sprite
-
                 switch (piece)
                 {
                     case Piece.White + Piece.Pawn:
@@ -118,6 +128,7 @@ public class ChessBoard : MonoBehaviour
     public void CreateOverlay(int pos)
     {
         GameObject GO = Instantiate(overlayPrefab);
+        overlays.Add(GO);
         Vector3 spawnpos = grid.CellToWorld(new Vector3Int(pos % 8, pos / 8, 0));
         spawnpos += grid.cellSize / 2;
         spawnpos.z = -1;
@@ -137,6 +148,13 @@ public class ChessBoard : MonoBehaviour
             }
         }
     }
+    
+    public void CreateOverlayFromMoves(List<Move> moves)
+    {
+        foreach (Move move in moves) {
+            CreateOverlay(move.DestinationSquare);
+        }
+    }
 
     public void ClearOverlays()
     {
@@ -154,6 +172,10 @@ public class ChessBoard : MonoBehaviour
         {
             GameState.BlackPerspective = !GameState.BlackPerspective;
             UpdateBoard();
+        }
+        if (Input.GetButtonDown("Undo Move"))
+        {
+            Board.UnmakeMove();
         }
     }
 }

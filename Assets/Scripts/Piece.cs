@@ -12,4 +12,10 @@
     //Colors
     public const int White = 8;
     public const int Black = 16;
+
+    public static bool IsType(int piece, int pieceType) 
+    {
+        //Color is: 0b1000, Mask is 0b111
+        return (piece & 0b111) == pieceType;
+    }
 }
