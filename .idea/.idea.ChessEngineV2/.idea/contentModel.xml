@@ -10,6 +10,7 @@
         <e p="Scripts" t="Include">
           <e p="Board.cs" t="Include" />
           <e p="BoardConfig.cs" t="Include" />
+          <e p="CameraController.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
           <e p="Piece.cs" t="Include" />
           <e p="PieceGO.cs" t="Include" />

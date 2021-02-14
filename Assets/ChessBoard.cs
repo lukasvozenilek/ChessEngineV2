@@ -13,10 +13,14 @@ public class ChessBoard : MonoBehaviour
     public Grid grid;
 
     public GameObject piecePrefab;
+    public GameObject overlayPrefab;
 
     public List<GameObject> pieces = new List<GameObject>();
-
+    public List<GameObject> overlays = new List<GameObject>();
+    
     public AudioSource audioSource;
+
+    
     
     void Start()
     {
@@ -28,6 +32,7 @@ public class ChessBoard : MonoBehaviour
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
         UpdateBoard();
+        //CreateOverlayFromBB(Board.BB_ALL);
     }
 
 
@@ -51,6 +56,9 @@ public class ChessBoard : MonoBehaviour
 
                 pieceGO.startSquare = pos;
                 pieceGO.chessBoardComponent = this;
+
+                Vector3 startScale = pieceGO.transform.localScale;
+                pieceGO.transform.localScale = new Vector3(startScale.x, GameState.BlackPerspective ? -1 : 1, startScale.z);
                 
                 //Set piece sprite
 
@@ -107,4 +115,45 @@ public class ChessBoard : MonoBehaviour
         pieces.Clear();
     }
     
+    public void CreateOverlay(int pos)
+    {
+        GameObject GO = Instantiate(overlayPrefab);
+        Vector3 spawnpos = grid.CellToWorld(new Vector3Int(pos % 8, pos / 8, 0));
+        spawnpos += grid.cellSize / 2;
+        spawnpos.z = -1;
+        GO.transform.position = spawnpos;
+    }
+
+    public void CreateOverlayFromBB(ulong bb)
+    {
+        ClearOverlays();
+        //Debug.Log( Convert.ToString((long)bb, 2));
+        for (int i = 0; i < 64; i++)
+        {
+            ulong mask = (ulong)1 << i;
+            if ((mask & bb) >= 1)
+            {
+                CreateOverlay(i);
+            }
+        }
+    }
+
+    public void ClearOverlays()
+    {
+        foreach (GameObject GO in overlays)
+        {
+            Destroy(GO);
+        }
+        overlays.Clear();
+    }
+
+
+    private void Update()
+    {
+        if (Input.GetButtonDown("Jump"))
+        {
+            GameState.BlackPerspective = !GameState.BlackPerspective;
+            UpdateBoard();
+        }
+    }
 }

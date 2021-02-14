@@ -8,6 +8,10 @@ public static class Board
 
     public static string startingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     
+    
+    public const ulong BB_ALL = 0xffffffffffffffff;
+    public const ulong BB_NONE = 0;
+    
     public static Dictionary<char, int> FENPieceNames = new Dictionary<char, int>
     {
         ['p'] = Piece.Pawn,
