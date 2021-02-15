@@ -28,7 +28,7 @@ public class PieceGO : MonoBehaviour
         //Check bounds of chess board
         if (destinationPos.x >= 0 && destinationPos.x <= 7 && destinationPos.y >= 0 && destinationPos.y <= 7 && destinationSquare != startSquare)
         {
-            MoveResult moveResult = Board.RequestMove(new Move(startSquare, destinationSquare, Board.Squares[destinationSquare]));
+            MoveResult moveResult = Board.RequestMove(new Move(startSquare, destinationSquare));
             if (moveResult.legal)
             {
                 if (moveResult.capture)

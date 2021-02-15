@@ -36,6 +36,13 @@ public class ChessBoard : MonoBehaviour
         UpdateBoard();
 
         GameState.UpdateBoardEvent += UpdateBoard;
+        
+        PERFTConfig config1 = new PERFTConfig();
+        config1.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        config1.requirements = new List<long>{1, 20, 400, 8902, 197281, 4865609};
+        //PERFT.RUN_PERFT(config1);
+        
+        Board.Restart();
     }
 
     private void OnDestroy()
@@ -154,6 +161,14 @@ public class ChessBoard : MonoBehaviour
             CreateOverlay(move.DestinationSquare);
         }
     }
+    
+    public void CreateOverlayFromSquares(List<int> moves)
+    {
+        ClearOverlays();
+        foreach (int square in moves) {
+            CreateOverlay(square);
+        }
+    }
 
     public void ClearOverlays()
     {
@@ -180,6 +195,16 @@ public class ChessBoard : MonoBehaviour
         if (Input.GetButtonDown("Legal Moves"))
         {
             CreateOverlayFromMoves(Board.GetAllLegalMoves());
+        }
+
+        if (Input.GetButtonDown("White Attacking Moves"))
+        {
+            CreateOverlayFromSquares(Board.whiteAttacks);
+        }
+        
+        if (Input.GetButtonDown("Black Attacking Moves"))
+        {
+            CreateOverlayFromSquares(Board.blackAttacks);
         }
     }
 }

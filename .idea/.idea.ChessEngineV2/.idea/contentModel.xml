@@ -12,6 +12,7 @@
           <e p="BoardConfig.cs" t="Include" />
           <e p="CameraController.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
+          <e p="PERFT.cs" t="Include" />
           <e p="Piece.cs" t="Include" />
           <e p="PieceGO.cs" t="Include" />
           <e p="UserInterface.cs" t="Include" />
