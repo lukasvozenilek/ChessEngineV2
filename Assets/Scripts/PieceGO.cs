@@ -24,7 +24,8 @@ public class PieceGO : MonoBehaviour
     {
         Vector3 destinationPos = chessBoardComponent.grid.WorldToCell(GameState.MainCamera.ScreenToWorldPoint(Input.mousePosition));
         int destinationSquare = (int) (destinationPos.x) + ((int) destinationPos.y * 8);
-
+        
+        //Check bounds of chess board
         if (destinationPos.x >= 0 && destinationPos.x <= 7 && destinationPos.y >= 0 && destinationPos.y <= 7 && destinationSquare != startSquare)
         {
             MoveResult moveResult = Board.RequestMove(new Move(startSquare, destinationSquare, Board.Squares[destinationSquare]));

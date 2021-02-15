@@ -24,6 +24,7 @@ public struct MoveResult
     public bool capture;
     public bool enpassant;
     public bool check;
+    public bool castle;
 }
 
 public static class Board
@@ -32,11 +33,20 @@ public static class Board
     public static int[] Squares;
     public static bool turn;
     public static List<Move> moves = new List<Move>();
+    
+    //Castling rights
+    public static bool castling_wk;
+    public static bool castling_wq;
+    public static bool castling_bk;
+    public static bool castling_bq;
 
     //Constants
     public const string startingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     public const ulong BB_ALL = 0xffffffffffffffff;
     public const ulong BB_NONE = 0;
+    public const int CASTLE_NONE = 0;
+    public const int CASTLE_KS = 1;
+    public const int CASTLE_QS = 2;
     
     public static Dictionary<char, int> FENPieceNames = new Dictionary<char, int>
     {
@@ -69,10 +79,23 @@ public static class Board
             EdgeDistanceArray[i, 6] = file;
             EdgeDistanceArray[i, 7] = Mathf.Min(file, 7 - rank);
         }
-        
-        LoadPositionFromFEN(startingFEN);
+        Board.Restart();
     }
 
+    public static void Restart()
+    {
+        LoadPositionFromFEN(startingFEN);
+        ResetCastlingRights();
+    }
+
+    public static void ResetCastlingRights()
+    {
+        castling_wk = true;
+        castling_wq = true;
+        castling_bk = true;
+        castling_bq = true;
+    }
+    
     public static void ClearBoard()
     {
         for (int i = 0; i < 64; i++) Squares[i] = Piece.None; 
@@ -109,21 +132,58 @@ public static class Board
                 }
             }
         }
+        GameState.UpdateBoard();
+    }
+
+    public static List<Move> GetAllLegalMoves()
+    {
+        List<Move> legalMoves = new List<Move>();
+        for (int i = 0; i < 64; i++)
+        {
+            if (GetPieceColor(i) == turn)
+            {
+                legalMoves.AddRange(GetLegalMovesFromSquare(i));
+            }
+        }
+        return legalMoves;
     }
 
     public static List<Move> GetLegalMovesFromSquare(int square)
     {
         int piece = Squares[square];
+        bool myColor = GetPieceColor(square);
         List<Move> legalmoves = new List<Move>();
 
         if (Piece.IsType(piece, Piece.Knight))
         {
-            Debug.Log("Knight!");
+            //Iterate through only longitudinal directions to find board edges
+            for (int i = 0; i < 8; i = i + 2)
+            {
+                //Continue if theres room
+                if (EdgeDistanceArray[square, i] >= 2)
+                {
+                    //Calculate intermediate square location
+                    int intermedSquare = square + (2 * DirectionToOffset(i));
+                
+                    //Now check both perpendicular directions
+                    for (int j = 0; j < 2; j++)
+                    {
+                        int i_perp = j == 0 ? i + 2 : i - 2;
+                        if (i_perp > 6) i_perp = 0;
+                        if (i_perp < 0) i_perp = 6;
+
+                        if (EdgeDistanceArray[intermedSquare, i_perp] >= 1)
+                        {
+                            int destSquare = intermedSquare + DirectionToOffset(i_perp);
+                            if (Squares[destSquare] == Piece.None || (Squares[destSquare] != Piece.None && Board.GetPieceColor(destSquare) != myColor)) legalmoves.Add(new Move(square, destSquare, Squares[destSquare]));
+                        }
+                    }
+                }
+            }
         }
         else if (Piece.IsType(piece, Piece.Pawn))
         {
             int destSquare;
-            bool myColor = GetPieceColor(square);
             //Pawn moving
             destSquare= GetPieceColor(square) ? square - 8 : square + 8;
             if (Squares[destSquare] == Piece.None)
@@ -185,6 +245,46 @@ public static class Board
                     }
                 }
             }
+            //Evaluate castling
+            if (Piece.IsType(piece, Piece.King))
+            {
+                //Black castling
+                if (myColor && (castling_bk || castling_bq))
+                {
+                    if (castling_bk)
+                    {
+                        if (Squares[square + 1] == Piece.None && Squares[square + 2] == Piece.None)
+                        {
+                            legalmoves.Add(new Move(square,square + 2 , Piece.None));
+                        }
+                    }
+                    if (castling_bq)
+                    {
+                        if (Squares[square - 1] == Piece.None && Squares[square - 2] == Piece.None && Squares[square - 3] == Piece.None)
+                        {
+                            legalmoves.Add(new Move(square,square - 2 , Piece.None));
+                        }
+                    }
+                }
+                //White Castling
+                else if (!myColor && (castling_wk || castling_wq))
+                {
+                    if (castling_wk)
+                    {
+                        if (Squares[square + 1] == Piece.None && Squares[square + 2] == Piece.None)
+                        {
+                            legalmoves.Add(new Move(square,square + 2 , Piece.None));
+                        }
+                    }
+                    if (castling_wq)
+                    {
+                        if (Squares[square - 1] == Piece.None && Squares[square - 2] == Piece.None && Squares[square - 3] == Piece.None)
+                        {
+                            legalmoves.Add(new Move(square,square - 2 , Piece.None));
+                        }
+                    }
+                }
+            }
         }
         return legalmoves;
     }
@@ -216,9 +316,53 @@ public static class Board
 
     public static void MakeMove(Move move)
     {
+        //Castling rights
+        if (move.StartSquare == 0 || move.StartSquare == 4) castling_wk = false;
+        if (move.StartSquare == 7 || move.StartSquare == 4) castling_wq = false;
+        if (move.StartSquare == 56 || move.StartSquare == 60) castling_bk = false;
+        if (move.StartSquare == 63 || move.StartSquare == 60) castling_bq = false;
+
         Squares[move.DestinationSquare] = Squares[move.StartSquare];
         Squares[move.StartSquare] = Piece.None;
+        
+        //Check if castle move
+        if (Piece.IsType(Squares[move.DestinationSquare], Piece.King) && (Mathf.Abs(move.StartSquare%8 - move.DestinationSquare%8) > 1) )
+        {
+            
+            if (GetPieceColor(move.DestinationSquare))
+            {
+                //Black
+                if (Squares[move.DestinationSquare + 1] != Piece.None)
+                {
+                    Squares[61] = Squares[63];
+                    Squares[63] = Piece.None;
+                }
+                else
+                {
+                    Squares[59] = Squares[56];
+                    Squares[56] = Piece.None;
+                }
+                
+            }
+            else
+            {
+                //White
+                if (Squares[move.DestinationSquare + 1] != Piece.None)
+                {
+                    Squares[5] = Squares[7];
+                    Squares[7] = Piece.None;
+                }
+                else
+                {
+                    Squares[3] = Squares[0];
+                    Squares[0] = Piece.None;
+                }
+            }
+            
+        }
+
         moves.Add(move);
+        GameState.UpdateBoard();
         turn = !turn;
     }
 
@@ -238,6 +382,7 @@ public static class Board
         if (GetPieceColor(move.StartSquare) == turn && GetLegalMovesFromSquare(move.StartSquare).Contains(move))
         {
             if (Squares[move.DestinationSquare] != Piece.None && GetPieceColor(move.DestinationSquare) != turn) result.capture = true;
+            //if (move.castle > 0) result.castle = true;
             MakeMove(move);
             result.legal = true;
         }

@@ -27,15 +27,13 @@ public class ChessBoard : MonoBehaviour
     void Start()
     {
         GameState.MainCamera = Camera.main;
-        print(Board.Squares[0]);
-
+        
         audioSource = GetComponent<AudioSource>();
 
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
         
         UpdateBoard();
-        //CreateOverlayFromBB(Board.BB_ALL);
 
         GameState.UpdateBoardEvent += UpdateBoard;
     }
@@ -151,6 +149,7 @@ public class ChessBoard : MonoBehaviour
     
     public void CreateOverlayFromMoves(List<Move> moves)
     {
+        ClearOverlays();
         foreach (Move move in moves) {
             CreateOverlay(move.DestinationSquare);
         }
@@ -176,6 +175,11 @@ public class ChessBoard : MonoBehaviour
         if (Input.GetButtonDown("Undo Move"))
         {
             Board.UnmakeMove();
+        }
+
+        if (Input.GetButtonDown("Legal Moves"))
+        {
+            CreateOverlayFromMoves(Board.GetAllLegalMoves());
         }
     }
 }
