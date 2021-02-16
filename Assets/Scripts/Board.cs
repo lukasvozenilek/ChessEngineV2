@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Windows.WebCam;
 
 public struct Move
 {
@@ -53,11 +50,7 @@ public static class Board
     public static bool castling_wq;
     public static bool castling_bk;
     public static bool castling_bq;
-    
-    //King legality
-    public static List<int> blackAttacks = new List<int>();
-    public static List<int> whiteAttacks = new List<int>();
-    
+
     public static List<int> whiteChecks = new List<int>();
     public static List<int> blackChecks = new List<int>();
     public static List<int> whitePins = new List<int>();
@@ -67,68 +60,18 @@ public static class Board
     public static List<int> potentialBlackPins = new List<int>();
 
     //Constants
-    public const string startingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    public const ulong BB_ALL = 0xffffffffffffffff;
-    public const ulong BB_NONE = 0;
-    public const int CASTLE_NONE = 0;
-    public const int CASTLE_KS = 1;
-    public const int CASTLE_QS = 2;
-    
-    public static Dictionary<char, int> FENPieceNames = new Dictionary<char, int>
-    {
-        ['p'] = Piece.Pawn,
-        ['k'] = Piece.King,
-        ['r'] = Piece.Rook,
-        ['q'] = Piece.Queen,
-        ['n'] = Piece.Knight,
-        ['b'] = Piece.Bishop
-    };
-    
-    public static char[] boardCoordinates = new char[8]
-    {
-        'A',
-        'B',
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'H'
-    };
-
-    public static int[,] EdgeDistanceArray;
-    public static ulong[] posToBBArray; 
+     
 
     static Board()
     {
         Squares = new int[64];
-        EdgeDistanceArray = new int[64,8];
-        posToBBArray = new ulong[64];
-
-        for (int i = 0; i < 64; i++)
-        {
-            int file = i % 8;
-            int rank = i / 8;
-
-            posToBBArray[i] = (ulong) 1 << i;
-            EdgeDistanceArray[i, 0] = 7 - rank;
-            EdgeDistanceArray[i, 1] = Mathf.Min(7 - rank, 7 - file);
-            EdgeDistanceArray[i, 2] = 7 - file;
-            EdgeDistanceArray[i, 3] = Mathf.Min(7 - file,rank );
-            EdgeDistanceArray[i, 4] = rank;
-            EdgeDistanceArray[i, 5] = Mathf.Min(rank,file);
-            EdgeDistanceArray[i, 6] = file;
-            EdgeDistanceArray[i, 7] = Mathf.Min(file, 7 - rank);
-        }
         Board.Restart();
     }
 
     public static void Restart()
     {
-        LoadPositionFromFEN(startingFEN);
+        LoadPositionFromFEN(Constants.startingFEN);
         ResetCastlingRights();
-        whiteAttacks.Clear();
-        blackAttacks.Clear();
     }
 
     public static void ResetCastlingRights()
@@ -169,7 +112,7 @@ public static class Board
                 else
                 {
                     int pieceid = char.IsUpper(item) ? Piece.White : Piece.Black;
-                    pieceid += FENPieceNames[char.ToLower(item)];
+                    pieceid += Constants.FENPieceNames[char.ToLower(item)];
                     Squares[boardpos] = pieceid;
                     boardpos++;
                 }
@@ -181,17 +124,7 @@ public static class Board
     public static List<Move> GetAllLegalMoves()
     {
         List<Move> legalMoves = new List<Move>();
-        
 
-        if (turn)
-        {
-            blackAttacks.Clear();
-        }
-        else
-        {
-            whiteAttacks.Clear();
-        }
-        
         for (int i = 0; i < 64; i++)
         {
             if (GetPieceColor(i) == turn)
@@ -208,7 +141,7 @@ public static class Board
         bool myColor = GetPieceColor(square);
         
         List<Move> legalmoves = new List<Move>();
-        ulong legalMovesBB = BB_NONE;
+        ulong legalMovesBB = Constants.BB_NONE;
         List<int> attackedLine = new List<int>();
         
         if (Piece.IsType(piece, Piece.Knight))
@@ -217,7 +150,7 @@ public static class Board
             for (int i = 0; i < 8; i = i + 2)
             {
                 //Continue if theres room
-                if (EdgeDistanceArray[square, i] >= 2)
+                if (Constants.EdgeDistanceArray[square, i] >= 2)
                 {
                     //Calculate intermediate square location
                     int intermedSquare = square + (2 * DirectionToOffset(i));
@@ -229,14 +162,12 @@ public static class Board
                         if (i_perp > 6) i_perp = 0;
                         if (i_perp < 0) i_perp = 6;
 
-                        if (EdgeDistanceArray[intermedSquare, i_perp] >= 1)
+                        if (Constants.EdgeDistanceArray[intermedSquare, i_perp] >= 1)
                         {
                             int destSquare = intermedSquare + DirectionToOffset(i_perp);
                             if (Squares[destSquare] == Piece.None || (Squares[destSquare] != Piece.None && Board.GetPieceColor(destSquare) != myColor))
                             {
                                 legalmoves.Add(new Move(square, destSquare));
-                                if (!myColor) whiteAttacks.Add(destSquare);
-                                if (myColor) blackAttacks.Add(destSquare);
                             }
                         }
                     }
@@ -284,8 +215,8 @@ public static class Board
             //Pawn Capturing, checks both diagonals
             for (int i = 0; i < 2; i++)
             {
-                if (i == 0 && EdgeDistanceArray[square, 7] == 0) continue;
-                if (i == 1 && EdgeDistanceArray[square, 2] == 0) continue;
+                if (i == 0 && Constants.EdgeDistanceArray[square, 7] == 0) continue;
+                if (i == 1 && Constants.EdgeDistanceArray[square, 2] == 0) continue;
                 int offset = i == 0 ? 7 : 9;
                 destSquare = myColor ? square - offset : square + offset;
                 if (destSquare < 63 && destSquare > 0)
@@ -293,13 +224,9 @@ public static class Board
                     if (passentSquare == destSquare)
                     {
                         legalmoves.Add(new Move(square, destSquare));
-                        if (!myColor) whiteAttacks.Add(destSquare);
-                        if (myColor) blackAttacks.Add(destSquare);
                     } else if (((Squares[destSquare] != Piece.None) && GetPieceColor(destSquare) != myColor))
                     {
                         legalmoves.Add(new Move(square, destSquare));
-                        if (!myColor) whiteAttacks.Add(destSquare);
-                        if (myColor) blackAttacks.Add(destSquare);
                     }
                 }
             }
@@ -318,7 +245,7 @@ public static class Board
                     attackedLine.Clear();
                     //Iterate along a direction here
                     int hits = 0;
-                    for (int j = 1; j < Mathf.Min(EdgeDistanceArray[square, i], maxDist) + 1; j++)
+                    for (int j = 1; j < Mathf.Min(Constants.EdgeDistanceArray[square, i], maxDist) + 1; j++)
                     {
                         int boardPos = square + (DirectionToOffset(i) * j);
                         int destpiece = Squares[boardPos];
@@ -720,26 +647,12 @@ public static class Board
             return false;
         }
     }
-
-    public const int QueenValue = 8;
-    public const int PawnValue = 1;
-    public const int KnightValue = 3;
-    public const int BishopValue = 3;
-    public const int RookValue = 5;
-
-    public static void EvaluateBoard()
-    {
-        for (int i = 0; i < 64; i++)
-        {
-            int piece = Squares[i];
-        }
-    }
-
+    
     public static string ConvertToCoord(int pos)
     {
         int rank = (pos / 8) + 1;
         int file = pos % 8;
 
-        return boardCoordinates[file].ToString().ToLower() + rank.ToString();
+        return Constants.boardCoordinates[file].ToString().ToLower() + rank.ToString();
     }
 }

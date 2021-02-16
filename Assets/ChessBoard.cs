@@ -40,7 +40,7 @@ public class ChessBoard : MonoBehaviour
         PERFTConfig config1 = new PERFTConfig();
         config1.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         //config1.requirements = new List<long>{1, 20, 400, 8902, 197281, 4865609};
-        config1.requirements = new List<long>{1, 20, 400, 8902};
+        config1.requirements = new List<long>{1, 20, 400, 8902, 197281};
         PERFT.RUN_PERFT(config1);
         
         //Board.Restart();

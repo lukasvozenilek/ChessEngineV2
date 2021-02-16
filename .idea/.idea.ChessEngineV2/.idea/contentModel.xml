@@ -11,6 +11,8 @@
           <e p="Board.cs" t="Include" />
           <e p="BoardConfig.cs" t="Include" />
           <e p="CameraController.cs" t="Include" />
+          <e p="Constants.cs" t="Include" />
+          <e p="Evaluation.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
           <e p="PERFT.cs" t="Include" />
           <e p="Piece.cs" t="Include" />
