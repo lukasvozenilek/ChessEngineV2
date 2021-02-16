@@ -21,7 +21,7 @@ public static class PERFT
     public static void RUN_PERFT(PERFTConfig config)
     {
         Debug.Log("RUNNING PERFT TEST!");
-        board = new Board();
+        board = new Board(config.FEN);
         float startTime = Time.realtimeSinceStartup;
         int result;
         bool passed = true;
@@ -29,6 +29,8 @@ public static class PERFT
         for (int i = 0; i < Mathf.Min(config.requirements.Count,config.depth+1); i++)
         {
             long requirement = config.requirements[i];
+            captures = 0;
+            checkmates = 0;
             PERFTDivideResults.Clear();
             result = testdepth(i, i);
             totalevals += result;
@@ -43,8 +45,15 @@ public static class PERFT
         Debug.Log("Duration: " +  elapsedTime);
         Debug.Log("Result: " + (passed?" PASSED" : " FAILED"));
         Debug.Log("Evaluation Speed: " + ( totalevals / elapsedTime) + "(" + (10 * Mathf.Log10(totalevals / elapsedTime)) + ") moves per second (dB)");
+        Debug.Log("Captures: " + captures);
+        Debug.Log("Checkmates: " + checkmates);
     }
 
+    private static int captures;
+    private static int checks;
+    private static int checkmates;
+    
+    
     private static int testdepth(int depth, int startdepth)
     {
         if (depth == 0)
@@ -53,9 +62,13 @@ public static class PERFT
         }
         int nodes = 0;
         List<Move> moves = MoveGenerator.GetAllLegalMoves(board).ToList();
+        if (moves.Count == 0) checkmates++;
         foreach (Move move in moves)
         {
-            board.MakeMove(move, false);
+            MoveResult result = board.MakeMove(move, false);
+            if (result.capture) captures++;
+            if (result.check) checks++;
+            
             int thisNode = testdepth(depth - 1, startdepth);
             nodes += thisNode;
             if (depth == startdepth)

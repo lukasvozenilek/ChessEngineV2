@@ -103,13 +103,13 @@ public class Board
         }
         
         //Next, En passant target square
-        string passantString = data[3];
+        //string passantString = data[3];
         
         //Next, Halfmove clock (for fifty move rule)
-        string halfmoveString = data[4];
+        //string halfmoveString = data[4];
         
         //Finally, fullmove number
-        string moveString = data[5];
+        //string moveString = data[5];
         
         GameState.UpdateBoard();
     }
@@ -264,10 +264,6 @@ public class Board
     public bool GetPieceColor(int square)
     {
         int piece = Squares[square];
-        if ((piece & Piece.White) > 0)
-        {
-            return false;
-        }
         return (piece & Piece.Black) > 0;
     }
 }

@@ -194,17 +194,21 @@ public class ChessBoard : MonoBehaviour
 
         if (Input.GetButtonDown("Legal Moves"))
         {
-            //CreateOverlayFromMoves(board.GetAllLegalMoves());
+            List<Move> moves = MoveGenerator.GetAllLegalMoves(board);
+            Debug.Log("Legal moves: " + moves.Count);
+            CreateOverlayFromMoves(moves);
         }
 
         if (Input.GetButtonDown("White Attacking Moves"))
         {
-            //CreateOverlayFromSquares(board.whitePins);
+            MoveGenerator.CalculateAttacks(board, false);
+            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
-            //CreateOverlayFromSquares(board.blackPins);
+            MoveGenerator.CalculateAttacks(board, true);
+            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
         }
     }
 }

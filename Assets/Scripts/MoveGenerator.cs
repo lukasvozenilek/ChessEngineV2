@@ -7,10 +7,11 @@ using UnityEngine;
 
 public static class MoveGenerator
 {
-    static List<Move> legalMoves = new List<Move>();
-    static List<int> attackedSquares = new List<int>();
-    static List<int> checkedSquares = new List<int>();
-    static List<int> pinnedSquares = new List<int>();
+    public static List<Move> legalMoves = new List<Move>();
+    public static List<int> attackedSquares = new List<int>();
+    public static List<int> checkedSquares = new List<int>();
+    public static List<int> pinnedSquares = new List<int>();
+    public static List<int> attackedLine = new List<int>();
 
     public static void CalculateAttacks(Board board, bool player)
     {
@@ -47,13 +48,10 @@ public static class MoveGenerator
                                     {
                                         destSquare = intermedSquare + Constants.DirectionToOffset(i_perp);
                                         int attackedPiece = board.Squares[destSquare];
-                                        if ( attackedPiece == Piece.None || (attackedPiece != Piece.None && board.GetPieceColor(destSquare) != player))
+                                        attackedSquares.Add(destSquare);
+                                        if (Piece.IsType(attackedPiece, Piece.King) && (board.GetPieceColor(destSquare) != player))
                                         {
-                                            if (Piece.IsType(attackedPiece, Piece.King))
-                                            {
-                                                checkedSquares.Add(destSquare);
-                                            }
-                                            attackedSquares.Add(destSquare);
+                                            checkedSquares.Add(square);
                                         }
                                     }
                                 }
@@ -64,21 +62,98 @@ public static class MoveGenerator
                         //Pawn Attacks, checks both diagonals
                         for (int pd = 0; pd < 2; pd++)
                         {
-                            int direction1 = board.turn ? 2 : 7;
-                            int direction2 = board.turn ? 7 : 2;
+                            int direction1 = player ? 2 : 7;
+                            int direction2 = player ? 7 : 2;
                             if (pd == 0 && Constants.EdgeDistanceArray[square, direction1] == 0) continue;
                             if (pd == 1 && Constants.EdgeDistanceArray[square, direction2] == 0) continue;
                             int offset = pd == 0 ? 7 : 9;
                             destSquare = player ? square - offset : square + offset;
                             if (destSquare > 63 || destSquare < 0) continue;
+                            if (Piece.IsType(board.Squares[destSquare], Piece.King) && board.GetPieceColor(destSquare) != player)
+                            {
+                                checkedSquares.Add(destSquare);
+                            }
                             attackedSquares.Add(destSquare);
                         }
                         break;
                     case Piece.Rook:
                     case Piece.Queen:
                     case Piece.Bishop:
+                        for (int direction = 0; direction < 8; direction++)
+                        {
+                            bool lat = direction % 2 == 0;
+                            attackedLine.Clear();
+                            bool hit = false;
+                            bool kinghit = false;
+                            
+                            if (Piece.IsType(piece, Piece.Queen) ||
+                                (lat && Piece.IsType(piece, Piece.Rook)) || 
+                                (!lat && Piece.IsType(piece, Piece.Bishop)))
+                            {
+                                //Iterate along a direction here
+                                for (int offset = 1; offset < Constants.EdgeDistanceArray[square, direction] + 1; offset++)
+                                {
+                                    int boardPos = square + (Constants.DirectionToOffset(direction) * offset);
+                                    if (boardPos < 0 || boardPos > 63) continue;
+                                    int destpiece = board.Squares[boardPos];
+                                    
+                                    
+                                    //First, check if a piece occupies this square
+                                    if (destpiece != Piece.None)
+                                    {
+                                        if (!hit) attackedSquares.Add(boardPos);
+                                        
+                                        //If our piece, stop here as no checks or pins can occur.
+                                        if (board.GetPieceColor(boardPos) == player) break;
+                                        
+                                        if (Piece.IsType(destpiece, Piece.King))
+                                        {
+                                            if (!hit)
+                                            {
+                                                checkedSquares.AddRange(attackedLine);
+                                                checkedSquares.Add(square);
+                                                if (kinghit)
+                                                {
+                                                    attackedSquares.Add(boardPos);
+                                                    break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                pinnedSquares.AddRange(attackedLine);
+                                                pinnedSquares.Add(square);
+                                                break;
+                                            }
+                                            kinghit = true;
+                                        }
+                                        else
+                                        {
+                                            if (hit)
+                                            {
+                                                break;
+                                            }
+                                            hit = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (!hit) attackedSquares.Add(boardPos); 
+                                    }
+                                    
+                                    attackedLine.Add(boardPos);
+                                }
+                            }
+                        }
                         break;
                     case Piece.King:
+                        for (int direction = 0; direction < 8; direction++)
+                        {
+                            int boardPos = square + Constants.DirectionToOffset(direction);
+                            if (attackedSquares.Contains(boardPos)) continue;
+                            if (boardPos < 0 || boardPos > 63) continue;
+                            int destpiece = board.Squares[boardPos];
+                            attackedSquares.Add(boardPos);
+                        }
                         break;
                 }
             }
@@ -302,14 +377,14 @@ public static class MoveGenerator
             {
                 foreach (Move move in legalMoves)
                 {
-                    if (pinnedSquares.Contains(move.StartSquare) || (pinnedSquares.Contains(move.StartSquare) && pinnedSquares.Contains(move.DestinationSquare)))
+                    //King can always move behind a pin
+                    if (Piece.IsType(board.Squares[move.StartSquare], Piece.King) || (!pinnedSquares.Contains(move.StartSquare) || (pinnedSquares.Contains(move.StartSquare) && pinnedSquares.Contains(move.DestinationSquare))))
                     {
                         filteredMoves.Add(move);
                     }
                 }
                 legalMoves = filteredMoves.ToList();
             }
-            
 
             //Checks
             if (checkedSquares.Count > 0)
