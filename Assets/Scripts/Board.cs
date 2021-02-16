@@ -16,14 +16,8 @@ public class Board
     public bool castling_bk;
     public bool castling_bq;
 
-    public List<int> whiteChecks = new List<int>();
-    public List<int> blackChecks = new List<int>();
-    public List<int> whitePins = new List<int>();
-    public List<int> blackPins = new List<int>();
-    
-    public List<int> potentialWhitePins = new List<int>();
-    public List<int> potentialBlackPins = new List<int>();
-    
+    public List<int> whitePieces = new List<int>();
+    public List<int> blackPieces = new List<int>();
     
     public Board(string FEN = Constants.startingFEN)
     {
@@ -47,12 +41,14 @@ public class Board
 
     public void LoadPositionFromFEN(string fen)
     {
-        //First, clear board
+        string[] data = fen.Split(' ');
+        
         ClearBoard();
         turn = false;
         
+        //First evaluate piece positions
         int boardpos = 56;
-        foreach (char item in fen)
+        foreach (char item in data[0])
         {
             if (item == ' ') break;
             if (item == '/')
@@ -75,6 +71,46 @@ public class Board
                 }
             }
         }
+        
+        //Next, who's move?
+        turn = data[1] != "w";
+        
+        //Next, castling rights
+        string castleString = data[2];
+        foreach (char item in castleString)
+        {
+            switch (item)
+            {
+                case '-':
+                    castling_bk = false;
+                    castling_bq = false;
+                    castling_wk = false;
+                    castling_wq = false;
+                    break;
+                case 'k':
+                    castling_bk = true;
+                    break;
+                case 'K':
+                    castling_wk = true;
+                    break;
+                case 'q':
+                    castling_bq = true;
+                    break;
+                case 'Q':
+                    castling_wq = true;
+                    break;
+            }
+        }
+        
+        //Next, En passant target square
+        string passantString = data[3];
+        
+        //Next, Halfmove clock (for fifty move rule)
+        string halfmoveString = data[4];
+        
+        //Finally, fullmove number
+        string moveString = data[5];
+        
         GameState.UpdateBoard();
     }
     
@@ -143,37 +179,9 @@ public class Board
                 }
             }
         }
-        
-        //Evaluate all possible new attacks
-        if (turn)
-        {
-            foreach (int sqr in potentialBlackPins.ToList())
-            {
-                //GetLegalMovesFromSquare(sqr);
-            }
-            //Clear opponents pins
-            whitePins.Clear();
-            potentialWhitePins.Clear();
-            whiteChecks.Clear();
-        }
-        else
-        {
-            foreach (int sqr in potentialWhitePins.ToList())
-            {
-                //GetLegalMovesFromSquare(sqr);
-            }
-            //Clear opponents pins
-            potentialBlackPins.Clear();
-            blackPins.Clear();
-            blackChecks.Clear();
-        }
-        
-        //Now evaluate new attacks
-        //GetLegalMovesFromSquare(move.DestinationSquare);
 
         //Finally, add move to records and update turn.
         moves.Add(result);
-        if (sendEvent) GameState.UpdateBoard();
         turn = !turn;
         return result;
     }
@@ -232,15 +240,9 @@ public class Board
         {
             Squares[lastMove.move.DestinationSquare] = lastMove.capturedPiece;
         }
-        
-        blackPins.Clear();
-        whitePins.Clear();
-        blackChecks.Clear();
-        whiteChecks.Clear();
-        
+
         moves.RemoveAt(moves.Count-1);
         turn = !turn;
-        if (sendEvent) GameState.UpdateBoard();
     }
 
     public MoveResult RequestMove(Move move)
@@ -265,13 +267,7 @@ public class Board
         if ((piece & Piece.White) > 0)
         {
             return false;
-        } else if ((piece & Piece.Black) > 0)
-        {
-            return true;
         }
-        else
-        {
-            return false;
-        }
+        return (piece & Piece.Black) > 0;
     }
 }

@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="4c787dc7-2836-4a05-bdaa-5f58470908a2" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,17 +34,17 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/BoardConfig.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/CameraController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameState.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
         <option value="$PROJECT_DIR$/Assets/ChessBoard.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluation.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Move.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PERFT.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MoveGenerator.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PERFT.cs" />
       </list>
     </option>
   </component>
@@ -84,7 +102,7 @@
       <workItem from="1613412281317" duration="22113000" />
       <workItem from="1613449323726" duration="725000" />
       <workItem from="1613455519829" duration="955000" />
-      <workItem from="1613460900283" duration="4092000" />
+      <workItem from="1613460900283" duration="9408000" />
     </task>
     <servers />
   </component>
@@ -93,6 +111,17 @@
   </component>
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="EditMode" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
@@ -101,9 +130,9 @@
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
     <state x="936" y="250" key="run.anything.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613370466726" />
-    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1613359744141">
+    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1613465745384">
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
-    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613359744141" />
+    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613465745384" />
   </component>
 </project>

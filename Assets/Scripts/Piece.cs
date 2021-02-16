@@ -18,4 +18,9 @@
         //Color is: 0b1000, Mask is 0b111
         return (piece & 0b111) == pieceType;
     }
+
+    public static int GetType(int piece)
+    {
+        return piece & 0b111;
+    }
 }

@@ -189,6 +189,7 @@ public class ChessBoard : MonoBehaviour
         if (Input.GetButtonDown("Undo Move"))
         {
             board.UnmakeMove();
+            UpdateBoard();
         }
 
         if (Input.GetButtonDown("Legal Moves"))
@@ -198,12 +199,12 @@ public class ChessBoard : MonoBehaviour
 
         if (Input.GetButtonDown("White Attacking Moves"))
         {
-            CreateOverlayFromSquares(board.whitePins);
+            //CreateOverlayFromSquares(board.whitePins);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
-            CreateOverlayFromSquares(board.blackPins);
+            //CreateOverlayFromSquares(board.blackPins);
         }
     }
 }
