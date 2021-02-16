@@ -19,27 +19,7 @@ namespace DefaultNamespace
 
         public void OnStartButton()
         {
-            TestLegalMoves();
-        }
-
-        public IEnumerator RunRandomGame()
-        {
-            Board.Restart();
-            List<Move> legalMoves;
-            while (true)
-            {
-                legalMoves = Board.GetAllLegalMoves();
-                if (legalMoves.Count == 0) break;
-                Board.MakeMove(legalMoves[Random.Range(0, legalMoves.Count)]);
-                yield return null;
-            }
-        }
-
-        public void TestLegalMoves()
-        {
-            //Board.LoadPositionFromFEN("8/3k4/3q4/6b1/8/1R2R3/3K4/8 w - - 0 1");
-            Board.LoadPositionFromFEN("3k4/7P/8/8/3q4/8/2KB4/R7 w - - 0 1");
-            chessBoardRef.CreateOverlayFromMoves(Board.GetAllLegalMoves());
+            
         }
     }
     

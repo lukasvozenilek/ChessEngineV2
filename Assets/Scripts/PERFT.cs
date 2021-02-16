@@ -13,10 +13,13 @@ public static class PERFT
 {
 
     public static Dictionary<string, int> PERFTDivideResults = new Dictionary<string, int>();
+
+    private static Board board;
+    
     public static void RUN_PERFT(PERFTConfig config)
     {
         Debug.Log("RUNNING PERFT TEST!");
-        Board.LoadPositionFromFEN(config.FEN);
+        board = new Board();
         float startTime = Time.realtimeSinceStartup;
         int result;
         int i = 0;
@@ -39,8 +42,6 @@ public static class PERFT
         Debug.Log("Duration: " +  elapsedTime);
         Debug.Log("Result: " + (passed?" PASSED" : " FAILED"));
         Debug.Log("Evaluation Speed: " + ( totalevals / elapsedTime) + "(" + (10 * Mathf.Log10(totalevals / elapsedTime)) + ") moves per second (dB)");
-
-        
     }
 
     private static int testdepth(int depth, int startdepth)
@@ -50,25 +51,22 @@ public static class PERFT
             return 1;
         }
         int nodes = 0;
-        List<Move> moves = Board.GetAllLegalMoves();
+        List<Move> moves = board.GetAllLegalMoves();
         foreach (Move move in moves)
         {
-            Board.MakeMove(move, false);
+            board.MakeMove(move, false);
             int thisNode = testdepth(depth - 1, startdepth);
             nodes += thisNode;
             if (depth == startdepth)
             {
-                string movename = MoveToString(move.StartSquare, move.DestinationSquare);
+                string movename = Constants.MoveToString(move);
                 PERFTDivideResults.Add(movename, thisNode);
             }
 
-            Board.UnmakeMove(sendEvent:false);
+            board.UnmakeMove(sendEvent:false);
         }
         return nodes;
     }
 
-    private static string MoveToString(int start, int end)
-    {
-        return Board.ConvertToCoord(start) + Board.ConvertToCoord(end);
-    }
+    
 }

@@ -17,13 +17,15 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/CameraController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameState.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PERFT.cs" />
         <option value="$PROJECT_DIR$/Assets/ChessBoard.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluation.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Move.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PERFT.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
       </list>
     </option>
   </component>
@@ -80,6 +82,7 @@
       <workItem from="1613327708373" duration="40416000" />
       <workItem from="1613412281317" duration="22113000" />
       <workItem from="1613449323726" duration="725000" />
+      <workItem from="1613455519829" duration="955000" />
     </task>
     <servers />
   </component>

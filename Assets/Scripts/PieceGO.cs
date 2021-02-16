@@ -6,6 +6,7 @@ public class PieceGO : MonoBehaviour
 {
     public SpriteRenderer pieceImage;
     public ChessBoard chessBoardComponent;
+    private Board boardRef;
 
     public int startSquare;
 
@@ -18,9 +19,9 @@ public class PieceGO : MonoBehaviour
     }
     public void OnMouseDown()
     {
-        if (Board.GetPieceColor(startSquare) == Board.turn)
+        if (boardRef.GetPieceColor(startSquare) == boardRef.turn)
         {
-            List<Move> legalMoves = Board.GetLegalMovesFromSquare(startSquare).movesList;
+            List<Move> legalMoves = boardRef.GetLegalMovesFromSquare(startSquare);
             Debug.Log(legalMoves.Count);
             chessBoardComponent.CreateOverlayFromMoves(legalMoves);
         }
@@ -34,7 +35,7 @@ public class PieceGO : MonoBehaviour
         //Check bounds of chess board
         if (destinationPos.x >= 0 && destinationPos.x <= 7 && destinationPos.y >= 0 && destinationPos.y <= 7 && destinationSquare != startSquare)
         {
-            MoveResult moveResult = Board.RequestMove(new Move(startSquare, destinationSquare));
+            MoveResult moveResult = boardRef.RequestMove(new Move(startSquare, destinationSquare));
             if (moveResult.legal)
             {
                 if (moveResult.capture)

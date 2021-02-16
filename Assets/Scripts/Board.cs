@@ -2,79 +2,36 @@
 using System.Linq;
 using UnityEngine;
 
-public struct Move
-{
-    public int StartSquare;
-    public int DestinationSquare;
 
-    public Move (int startSqr, int destSqr)
-    {
-        StartSquare = startSqr;
-        DestinationSquare = destSqr;
-    }
-}
-
-public struct MoveResult
-{
-    public Move move;
-    public bool legal;
-    public bool capture;
-    public int capturedPiece;
-    public bool enpassant;
-    public bool check;
-    public bool castle;
-    public bool forfeitedCastling;
-}
-
-public struct LegalMoveQueryResult
-{
-    public List<Move> movesList;
-    public ulong destinationBB;
-
-    public LegalMoveQueryResult(List<Move> movesList, ulong destinationBB)
-    {
-        this.movesList = movesList;
-        this.destinationBB = destinationBB;
-    }
-}
-
-public static class Board
+public class Board
 {
     //Board variables
-    public static int[] Squares;
-    public static bool turn;
-    public static List<MoveResult> moves = new List<MoveResult>();
+    public int[] Squares;
+    public bool turn;
+    public List<MoveResult> moves = new List<MoveResult>();
     
     //Castling rights
-    public static bool castling_wk;
-    public static bool castling_wq;
-    public static bool castling_bk;
-    public static bool castling_bq;
+    public bool castling_wk;
+    public bool castling_wq;
+    public bool castling_bk;
+    public bool castling_bq;
 
-    public static List<int> whiteChecks = new List<int>();
-    public static List<int> blackChecks = new List<int>();
-    public static List<int> whitePins = new List<int>();
-    public static List<int> blackPins = new List<int>();
+    public List<int> whiteChecks = new List<int>();
+    public List<int> blackChecks = new List<int>();
+    public List<int> whitePins = new List<int>();
+    public List<int> blackPins = new List<int>();
     
-    public static List<int> potentialWhitePins = new List<int>();
-    public static List<int> potentialBlackPins = new List<int>();
-
-    //Constants
-     
-
-    static Board()
+    public List<int> potentialWhitePins = new List<int>();
+    public List<int> potentialBlackPins = new List<int>();
+    
+    
+    public Board(string FEN = Constants.startingFEN)
     {
         Squares = new int[64];
-        Board.Restart();
+        LoadPositionFromFEN(FEN);
     }
 
-    public static void Restart()
-    {
-        LoadPositionFromFEN(Constants.startingFEN);
-        ResetCastlingRights();
-    }
-
-    public static void ResetCastlingRights()
+    public void ResetCastlingRights()
     {
         castling_wk = true;
         castling_wq = true;
@@ -82,13 +39,13 @@ public static class Board
         castling_bq = true;
     }
     
-    public static void ClearBoard()
+    public void ClearBoard()
     {
         for (int i = 0; i < 64; i++) Squares[i] = Piece.None; 
         moves.Clear();
     }
 
-    public static void LoadPositionFromFEN(string fen)
+    public void LoadPositionFromFEN(string fen)
     {
         //First, clear board
         ClearBoard();
@@ -121,7 +78,7 @@ public static class Board
         GameState.UpdateBoard();
     }
 
-    public static List<Move> GetAllLegalMoves()
+    public List<Move> GetAllLegalMoves()
     {
         List<Move> legalMoves = new List<Move>();
 
@@ -129,13 +86,13 @@ public static class Board
         {
             if (GetPieceColor(i) == turn)
             {
-                legalMoves.AddRange(GetLegalMovesFromSquare(i).movesList);
+                legalMoves.AddRange(GetLegalMovesFromSquare(i));
             }
         }
         return legalMoves;
     }
 
-    public static LegalMoveQueryResult GetLegalMovesFromSquare(int square)
+    public List<Move> GetLegalMovesFromSquare(int square)
     {
         int piece = Squares[square];
         bool myColor = GetPieceColor(square);
@@ -153,7 +110,7 @@ public static class Board
                 if (Constants.EdgeDistanceArray[square, i] >= 2)
                 {
                     //Calculate intermediate square location
-                    int intermedSquare = square + (2 * DirectionToOffset(i));
+                    int intermedSquare = square + (2 * Constants.DirectionToOffset(i));
                 
                     //Now check both perpendicular directions
                     for (int j = 0; j < 2; j++)
@@ -164,8 +121,8 @@ public static class Board
 
                         if (Constants.EdgeDistanceArray[intermedSquare, i_perp] >= 1)
                         {
-                            int destSquare = intermedSquare + DirectionToOffset(i_perp);
-                            if (Squares[destSquare] == Piece.None || (Squares[destSquare] != Piece.None && Board.GetPieceColor(destSquare) != myColor))
+                            int destSquare = intermedSquare + Constants.DirectionToOffset(i_perp);
+                            if (Squares[destSquare] == Piece.None || (Squares[destSquare] != Piece.None && GetPieceColor(destSquare) != myColor))
                             {
                                 legalmoves.Add(new Move(square, destSquare));
                             }
@@ -247,7 +204,7 @@ public static class Board
                     int hits = 0;
                     for (int j = 1; j < Mathf.Min(Constants.EdgeDistanceArray[square, i], maxDist) + 1; j++)
                     {
-                        int boardPos = square + (DirectionToOffset(i) * j);
+                        int boardPos = square + (Constants.DirectionToOffset(i) * j);
                         int destpiece = Squares[boardPos];
 
                         //First, check if a piece occupies this square
@@ -421,37 +378,14 @@ public static class Board
             }
             legalmoves = filteredMoves.ToList();
         }
-        
-        
-        return new LegalMoveQueryResult(legalmoves, legalMovesBB);
+
+
+        return legalmoves;
     }
 
-    public static int DirectionToOffset(int dir)
-    {
-        switch (dir)
-        {
-            case 0:
-                return 8;
-            case 1:
-                return 9;
-            case 2:
-                return 1;
-            case 3:
-                return -7;
-            case 4:
-                return -8;
-            case 5:
-                return -9;
-            case 6:
-                return -1;
-            case 7:
-                return 7;
-            default:
-                return 0;
-        }
-    }
+    
 
-    public static MoveResult MakeMove(Move move, bool sendEvent = true)
+    public MoveResult MakeMove(Move move, bool sendEvent = true)
     {
         MoveResult result = new MoveResult();
         result.move = move;
@@ -551,7 +485,7 @@ public static class Board
         return result;
     }
 
-    public static void UnmakeMove(bool sendEvent=true)
+    public void UnmakeMove(bool sendEvent=true)
     {
         if (moves.Count == 0) return;
         MoveResult lastMove = moves[moves.Count-1];
@@ -616,11 +550,11 @@ public static class Board
         if (sendEvent) GameState.UpdateBoard();
     }
 
-    public static MoveResult RequestMove(Move move)
+    public MoveResult RequestMove(Move move)
     {
         MoveResult result = new MoveResult();
         result.move = move;
-        if (GetPieceColor(move.StartSquare) == turn && GetLegalMovesFromSquare(move.StartSquare).movesList.Contains(move))
+        if (GetPieceColor(move.StartSquare) == turn && GetLegalMovesFromSquare(move.StartSquare).Contains(move))
         {
             result = MakeMove(move);
             result.legal = true;
@@ -632,7 +566,7 @@ public static class Board
         return result;
     }
 
-    public static bool GetPieceColor(int square)
+    public bool GetPieceColor(int square)
     {
         int piece = Squares[square];
         if ((piece & Piece.White) > 0)
@@ -646,13 +580,5 @@ public static class Board
         {
             return false;
         }
-    }
-    
-    public static string ConvertToCoord(int pos)
-    {
-        int rank = (pos / 8) + 1;
-        int file = pos % 8;
-
-        return Constants.boardCoordinates[file].ToString().ToLower() + rank.ToString();
     }
 }

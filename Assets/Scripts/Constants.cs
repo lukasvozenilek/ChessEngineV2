@@ -53,6 +53,43 @@ public static class Constants
             EdgeDistanceArray[i, 6] = file;
             EdgeDistanceArray[i, 7] = Mathf.Min(file, 7 - rank);
         }
-        Board.Restart();
+    }
+    
+    public static int DirectionToOffset(int dir)
+    {
+        switch (dir)
+        {
+            case 0:
+                return 8;
+            case 1:
+                return 9;
+            case 2:
+                return 1;
+            case 3:
+                return -7;
+            case 4:
+                return -8;
+            case 5:
+                return -9;
+            case 6:
+                return -1;
+            case 7:
+                return 7;
+            default:
+                return 0;
+        }
+    }
+    
+    public static string ConvertToCoord(int pos)
+    {
+        int rank = (pos / 8) + 1;
+        int file = pos % 8;
+
+        return boardCoordinates[file].ToString().ToLower() + rank.ToString();
+    }
+    
+    public static string MoveToString(Move move)
+    {
+        return Constants.ConvertToCoord(move.StartSquare) + Constants.ConvertToCoord(move.DestinationSquare);
     }
 }

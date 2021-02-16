@@ -6,8 +6,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// ChessBoard.cs is responsible for the graphical representation of the board. It manages updating the piece objects from the static board
-/// state as well as flipping pieces for black's perspective.
+/// ChessBoard.cs is the monobehaviour responsible for the graphical representation of the board
 /// </summary>
 public class ChessBoard : MonoBehaviour
 {
@@ -48,48 +47,19 @@ public class ChessBoard : MonoBehaviour
         //StartCoroutine(testDepthSlowly());
     }
     
-
-    private static IEnumerator testDepthSlowly()
-    {
-        int i = 0;
-        yield return new WaitForSecondsRealtime(2);
-        while (true)
-        {
-            foreach (Move move in Board.GetAllLegalMoves())
-            {
-                Board.MakeMove(move);
-                foreach (Move move2 in Board.GetAllLegalMoves())
-                {
-                    Board.MakeMove(move2);
-                    foreach (Move move3 in Board.GetAllLegalMoves())
-                    {
-                        Board.MakeMove(move3);
-                        i++;
-                        yield return new WaitForSecondsRealtime(0.001f);
-                        Board.UnmakeMove();
-                    }
-                    Board.UnmakeMove();
-                }
-                
-                Board.UnmakeMove();
-            }
-            break;
-        }
-        Debug.Log(i);
-    }
-    
-
     private void OnDestroy()
     {
         GameState.UpdateBoardEvent -= UpdateBoard;
     }
 
+    
 
     public void UpdateBoard()
     {
         ClearBoard();
         ClearOverlays();
         int pos = 0;
+        /*
         foreach (int piece in Board.Squares)
         {
             if (piece != Piece.None)
@@ -152,7 +122,9 @@ public class ChessBoard : MonoBehaviour
                 }
             }
             pos++;
+            
         }
+        */
     }
 
     public void ClearBoard()
@@ -223,22 +195,22 @@ public class ChessBoard : MonoBehaviour
         }
         if (Input.GetButtonDown("Undo Move"))
         {
-            Board.UnmakeMove();
+            //Board.UnmakeMove();
         }
 
         if (Input.GetButtonDown("Legal Moves"))
         {
-            CreateOverlayFromMoves(Board.GetAllLegalMoves());
+            //CreateOverlayFromMoves(Board.GetAllLegalMoves());
         }
 
         if (Input.GetButtonDown("White Attacking Moves"))
         {
-            CreateOverlayFromSquares(Board.whitePins);
+            //CreateOverlayFromSquares(Board.whitePins);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
-            CreateOverlayFromSquares(Board.blackPins);
+            //CreateOverlayFromSquares(Board.blackPins);
         }
     }
 }
