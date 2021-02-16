@@ -39,11 +39,45 @@ public class ChessBoard : MonoBehaviour
         
         PERFTConfig config1 = new PERFTConfig();
         config1.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        config1.requirements = new List<long>{1, 20, 400, 8902, 197281, 4865609};
-        //PERFT.RUN_PERFT(config1);
+        //config1.requirements = new List<long>{1, 20, 400, 8902, 197281, 4865609};
+        config1.requirements = new List<long>{1, 20, 400, 8902};
+        PERFT.RUN_PERFT(config1);
         
-        Board.Restart();
+        //Board.Restart();
+
+        //StartCoroutine(testDepthSlowly());
     }
+    
+
+    private static IEnumerator testDepthSlowly()
+    {
+        int i = 0;
+        yield return new WaitForSecondsRealtime(2);
+        while (true)
+        {
+            foreach (Move move in Board.GetAllLegalMoves())
+            {
+                Board.MakeMove(move);
+                foreach (Move move2 in Board.GetAllLegalMoves())
+                {
+                    Board.MakeMove(move2);
+                    foreach (Move move3 in Board.GetAllLegalMoves())
+                    {
+                        Board.MakeMove(move3);
+                        i++;
+                        yield return new WaitForSecondsRealtime(0.001f);
+                        Board.UnmakeMove();
+                    }
+                    Board.UnmakeMove();
+                }
+                
+                Board.UnmakeMove();
+            }
+            break;
+        }
+        Debug.Log(i);
+    }
+    
 
     private void OnDestroy()
     {
@@ -199,12 +233,12 @@ public class ChessBoard : MonoBehaviour
 
         if (Input.GetButtonDown("White Attacking Moves"))
         {
-            CreateOverlayFromSquares(Board.whiteAttacks);
+            CreateOverlayFromSquares(Board.whitePins);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
-            CreateOverlayFromSquares(Board.blackAttacks);
+            CreateOverlayFromSquares(Board.blackPins);
         }
     }
 }

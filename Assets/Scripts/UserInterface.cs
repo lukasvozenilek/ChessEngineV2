@@ -37,7 +37,8 @@ namespace DefaultNamespace
 
         public void TestLegalMoves()
         {
-            Board.LoadPositionFromFEN("8/3k4/3q4/6b1/8/1R2R3/3K4/8 w - - 0 1");
+            //Board.LoadPositionFromFEN("8/3k4/3q4/6b1/8/1R2R3/3K4/8 w - - 0 1");
+            Board.LoadPositionFromFEN("3k4/7P/8/8/3q4/8/2KB4/R7 w - - 0 1");
             chessBoardRef.CreateOverlayFromMoves(Board.GetAllLegalMoves());
         }
     }

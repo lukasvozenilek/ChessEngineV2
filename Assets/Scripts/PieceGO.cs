@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PieceGO : MonoBehaviour
@@ -17,7 +18,12 @@ public class PieceGO : MonoBehaviour
     }
     public void OnMouseDown()
     {
-        if (Board.GetPieceColor(startSquare) == Board.turn) chessBoardComponent.CreateOverlayFromMoves(Board.GetLegalMovesFromSquare(startSquare));
+        if (Board.GetPieceColor(startSquare) == Board.turn)
+        {
+            List<Move> legalMoves = Board.GetLegalMovesFromSquare(startSquare).movesList;
+            Debug.Log(legalMoves.Count);
+            chessBoardComponent.CreateOverlayFromMoves(legalMoves);
+        }
     }
 
     public void OnMouseUp()
