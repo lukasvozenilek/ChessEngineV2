@@ -31,20 +31,20 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/Scripts/BoardConfig.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/CameraController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameState.cs" />
         <option value="$PROJECT_DIR$/Assets/ChessBoard.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluation.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Move.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/MoveGenerator.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/PERFT.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/BoardConfig.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Move.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MoveGenerator.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
       </list>
     </option>
   </component>
@@ -104,7 +104,7 @@
       <workItem from="1613455519829" duration="955000" />
       <workItem from="1613460900283" duration="9408000" />
       <workItem from="1613495095698" duration="10840000" />
-      <workItem from="1613508636855" duration="1132000" />
+      <workItem from="1613508636855" duration="6087000" />
     </task>
     <servers />
   </component>

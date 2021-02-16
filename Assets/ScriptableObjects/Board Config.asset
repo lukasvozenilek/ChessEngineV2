@@ -16,6 +16,8 @@ MonoBehaviour:
   blackColor: {r: 0.70980394, g: 0.53333336, b: 0.38823533, a: 1}
   captureSound: {fileID: 8300000, guid: afd9ff25063d1764886b38c1cf4f6138, type: 3}
   moveSound: {fileID: 8300000, guid: 2cb3d960a47ebaf4ea6b3ae6077adbdf, type: 3}
+  checkSound: {fileID: 8300000, guid: 5da3da04b40fca84abe4adca4f23b073, type: 3}
+  castleSound: {fileID: 8300000, guid: 203e6ad9bbc09d94ea5498a4f2612689, type: 3}
   whiteKing: {fileID: -5619150752979459227, guid: 754c671d9921e774bbaab0f8cd1b0a57,
     type: 3}
   whiteQueen: {fileID: 6835995104348828855, guid: 754c671d9921e774bbaab0f8cd1b0a57,

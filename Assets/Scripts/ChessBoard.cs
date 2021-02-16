@@ -46,7 +46,6 @@ public class ChessBoard : MonoBehaviour
     {
         GameState.UpdateBoardEvent -= UpdateBoard;
     }
-    
 
     public void UpdateBoard()
     {
@@ -61,7 +60,7 @@ public class ChessBoard : MonoBehaviour
                 GameObject GO = Instantiate(piecePrefab);
                 pieces.Add(GO);
                 PieceGO pieceGO = GO.GetComponent<PieceGO>();
-
+                pieceGO.pieceID = piece;
                 //Calculate spawn position
                 Vector3 spawnpos = grid.CellToWorld(new Vector3Int(pos % 8, pos / 8, 0));
                 spawnpos += grid.cellSize / 2;
@@ -116,7 +115,6 @@ public class ChessBoard : MonoBehaviour
                 }
             }
             pos++;
-            
         }
     }
 

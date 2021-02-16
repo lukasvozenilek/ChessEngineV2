@@ -20,7 +20,6 @@ public static class MoveGenerator
         pinnedSquares.Clear();
 
         int destSquare;
-
         for (int square = 0; square < 64; square++)
         {
             if (!Piece.IsType(board.Squares[square], Piece.None) && board.GetPieceColor(square) == player)
@@ -334,36 +333,65 @@ public static class MoveGenerator
                         {
                             if (board.castling_bk)
                             {
-                                if (board.Squares[square + 1] == Piece.None && board.Squares[square + 2] == Piece.None)
+                                if (!attackedSquares.Contains(square + 1) &&
+                                    !attackedSquares.Contains(square + 2))
                                 {
-                                    legalMoves.Add(new Move(square, square + 2));
+                                    if (board.Squares[square + 1] == Piece.None &&
+                                        board.Squares[square + 2] == Piece.None &&
+                                        Piece.IsType(board.Squares[square + 3], Piece.Rook))
+                                    {
+                                        legalMoves.Add(new Move(square, square + 2));
+                                    }
                                 }
                             }
 
                             if (board.castling_bq)
                             {
-                                if (board.Squares[square - 1] == Piece.None && board.Squares[square - 2] == Piece.None && board.Squares[square - 3] == Piece.None)
+                                if (!attackedSquares.Contains(square - 1) &&
+                                    !attackedSquares.Contains(square -2 ) && 
+                                    !attackedSquares.Contains(square -3))
                                 {
-                                    legalMoves.Add(new Move(square, square - 2));
+                                    if (board.Squares[square - 1] == Piece.None &&
+                                        board.Squares[square - 2] == Piece.None &&
+                                        board.Squares[square - 3] == Piece.None &&
+                                        Piece.IsType(board.Squares[square - 4], Piece.Rook))
+                                    {
+                                        legalMoves.Add(new Move(square, square - 2));
+                                    }
                                 }
                             }
                         }
+                        
                         //White Castling
                         else if (!myColor && (board.castling_wk || board.castling_wq))
                         {
                             if (board.castling_wk)
                             {
-                                if (board.Squares[square + 1] == Piece.None && board.Squares[square + 2] == Piece.None)
+                                if (!attackedSquares.Contains(square + 1) &&
+                                    !attackedSquares.Contains(square + 2))
                                 {
-                                    legalMoves.Add(new Move(square, square + 2));
+                                    if (board.Squares[square + 1] == Piece.None &&
+                                        board.Squares[square + 2] == Piece.None &&
+                                        Piece.IsType(board.Squares[square + 3], Piece.Rook))
+                                    {
+                                        legalMoves.Add(new Move(square, square + 2));
+                                    }
                                 }
                             }
 
                             if (board.castling_wq)
                             {
-                                if (board.Squares[square - 1] == Piece.None && board.Squares[square - 2] == Piece.None && board.Squares[square - 3] == Piece.None)
+                                if (!attackedSquares.Contains(square + 1) &&
+                                    !attackedSquares.Contains(square + 2) &&
+                                    !attackedSquares.Contains(square + 3))
                                 {
-                                    legalMoves.Add(new Move(square, square - 2));
+                                    if (board.Squares[square - 1] == Piece.None &&
+                                        board.Squares[square - 2] == Piece.None &&
+                                        board.Squares[square - 3] == Piece.None &&
+                                        Piece.IsType(board.Squares[square - 4], Piece.Rook))
+                                    {
+                                        legalMoves.Add(new Move(square, square - 2));
+                                    }
                                 }
                             }
                         }
@@ -402,7 +430,6 @@ public static class MoveGenerator
 
                 legalMoves = filteredMoves.ToList();
             }
-
         }
         return legalMoves;
     }

@@ -12,6 +12,8 @@ namespace DefaultNamespace
         [Header("Audio")] 
         public AudioClip captureSound;
         public AudioClip moveSound;
+        public AudioClip checkSound;
+        public AudioClip castleSound;
 
         [Header("White Pieces")]
         public Sprite whiteKing;

@@ -2,13 +2,16 @@
 {
     public int StartSquare;
     public int DestinationSquare;
+    public int promotionID;
 
-    public Move (int startSqr, int destSqr)
+    public Move(int startSqr, int destSqr, int promotionID = 0)
     {
         StartSquare = startSqr;
         DestinationSquare = destSqr;
+        this.promotionID = promotionID;
     }
 }
+
 public struct MoveResult
 {
     public Move move;

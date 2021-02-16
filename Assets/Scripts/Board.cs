@@ -121,10 +121,10 @@ public class Board
         result.move = move;
         
         //Castling rights
-        if (move.StartSquare == 0 || move.StartSquare == 4) castling_wk = false;
-        if (move.StartSquare == 7 || move.StartSquare == 4) castling_wq = false;
-        if (move.StartSquare == 56 || move.StartSquare == 60) castling_bk = false;
-        if (move.StartSquare == 63 || move.StartSquare == 60) castling_bq = false;
+        if (move.StartSquare == 0 || move.StartSquare == 4) castling_wq = false;
+        if (move.StartSquare == 7 || move.StartSquare == 4) castling_wk = false;
+        if (move.StartSquare == 56 || move.StartSquare == 60) castling_bq = false;
+        if (move.StartSquare == 63 || move.StartSquare == 60) castling_bk = false;
 
         result.capturedPiece = Squares[move.DestinationSquare];
         result.capture = Squares[move.DestinationSquare] != Piece.None;
