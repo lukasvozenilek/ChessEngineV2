@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PieceGO : MonoBehaviour
 {
     public SpriteRenderer pieceImage;
     public ChessBoard chessBoardComponent;
-    private Board boardRef;
 
     public int startSquare;
 
@@ -15,14 +15,15 @@ public class PieceGO : MonoBehaviour
         Vector3 newPos = GameState.MainCamera.ScreenToWorldPoint(Input.mousePosition);
         newPos.z = -1;
         transform.position = newPos;
-        
     }
     public void OnMouseDown()
     {
-        if (boardRef.GetPieceColor(startSquare) == boardRef.turn)
+        if (chessBoardComponent.board.GetPieceColor(startSquare) == chessBoardComponent.board.turn)
         {
-            List<Move> legalMoves = boardRef.GetLegalMovesFromSquare(startSquare);
-            Debug.Log(legalMoves.Count);
+            List<Move> legalMoves = MoveGenerator.GetAllLegalMoves(chessBoardComponent.board).Where(move =>
+            {
+                return move.StartSquare == startSquare; 
+            }).ToList();
             chessBoardComponent.CreateOverlayFromMoves(legalMoves);
         }
     }
@@ -35,7 +36,7 @@ public class PieceGO : MonoBehaviour
         //Check bounds of chess board
         if (destinationPos.x >= 0 && destinationPos.x <= 7 && destinationPos.y >= 0 && destinationPos.y <= 7 && destinationSquare != startSquare)
         {
-            MoveResult moveResult = boardRef.RequestMove(new Move(startSquare, destinationSquare));
+            MoveResult moveResult = chessBoardComponent.board.RequestMove(new Move(startSquare, destinationSquare));
             if (moveResult.legal)
             {
                 if (moveResult.capture)

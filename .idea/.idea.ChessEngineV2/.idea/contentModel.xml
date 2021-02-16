@@ -15,6 +15,7 @@
           <e p="Evaluation.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
           <e p="Move.cs" t="Include" />
+          <e p="MoveGenerator.cs" t="Include" />
           <e p="PERFT.cs" t="Include" />
           <e p="Piece.cs" t="Include" />
           <e p="PieceGO.cs" t="Include" />

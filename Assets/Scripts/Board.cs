@@ -77,312 +77,6 @@ public class Board
         }
         GameState.UpdateBoard();
     }
-
-    public List<Move> GetAllLegalMoves()
-    {
-        List<Move> legalMoves = new List<Move>();
-
-        for (int i = 0; i < 64; i++)
-        {
-            if (GetPieceColor(i) == turn)
-            {
-                legalMoves.AddRange(GetLegalMovesFromSquare(i));
-            }
-        }
-        return legalMoves;
-    }
-
-    public List<Move> GetLegalMovesFromSquare(int square)
-    {
-        int piece = Squares[square];
-        bool myColor = GetPieceColor(square);
-        
-        List<Move> legalmoves = new List<Move>();
-        ulong legalMovesBB = Constants.BB_NONE;
-        List<int> attackedLine = new List<int>();
-        
-        if (Piece.IsType(piece, Piece.Knight))
-        {
-            //Iterate through only longitudinal directions to find board edges
-            for (int i = 0; i < 8; i = i + 2)
-            {
-                //Continue if theres room
-                if (Constants.EdgeDistanceArray[square, i] >= 2)
-                {
-                    //Calculate intermediate square location
-                    int intermedSquare = square + (2 * Constants.DirectionToOffset(i));
-                
-                    //Now check both perpendicular directions
-                    for (int j = 0; j < 2; j++)
-                    {
-                        int i_perp = j == 0 ? i + 2 : i - 2;
-                        if (i_perp > 6) i_perp = 0;
-                        if (i_perp < 0) i_perp = 6;
-
-                        if (Constants.EdgeDistanceArray[intermedSquare, i_perp] >= 1)
-                        {
-                            int destSquare = intermedSquare + Constants.DirectionToOffset(i_perp);
-                            if (Squares[destSquare] == Piece.None || (Squares[destSquare] != Piece.None && GetPieceColor(destSquare) != myColor))
-                            {
-                                legalmoves.Add(new Move(square, destSquare));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if (Piece.IsType(piece, Piece.Pawn))
-        {
-            int destSquare;
-            //Pawn moving
-            destSquare = GetPieceColor(square) ? square - 8 : square + 8;
-            //Ensure still in bounds of board
-            if (destSquare < 63 && destSquare > 0)
-            {
-                if (Squares[destSquare] == Piece.None)
-                {
-                    legalmoves.Add(new Move(square, destSquare));
-                    //Check if pawn on original square
-                    if ((square / 8 == 1 && !myColor) || square / 8 == 6 && myColor)
-                    {
-                        destSquare = myColor ? square - 16 : square + 16;
-                        if (Squares[destSquare] == Piece.None) legalmoves.Add(new Move(square, destSquare));
-                    }
-                } 
-            }
-            
-            int passentSquare = -1;
-            //En passant, checks if last move was a pawn push
-            if (moves.Count > 0)
-            {
-                Move previousMove = moves[moves.Count - 1].move;
-                //Check if last move was a pawn move
-                if (Piece.IsType(Squares[previousMove.DestinationSquare], Piece.Pawn))
-                {
-                    //Next see if that pawn moved more than 1 square
-                    if (Mathf.Abs(previousMove.StartSquare / 8 - previousMove.DestinationSquare / 8) > 1)
-                    {
-                        //If so, this is a legal en passent move.
-                        int offset = GetPieceColor(previousMove.DestinationSquare) ? -8 : 8;
-                        passentSquare = previousMove.StartSquare + offset;
-                    }
-                }
-            }
-            
-            //Pawn Capturing, checks both diagonals
-            for (int i = 0; i < 2; i++)
-            {
-                if (i == 0 && Constants.EdgeDistanceArray[square, 7] == 0) continue;
-                if (i == 1 && Constants.EdgeDistanceArray[square, 2] == 0) continue;
-                int offset = i == 0 ? 7 : 9;
-                destSquare = myColor ? square - offset : square + offset;
-                if (destSquare < 63 && destSquare > 0)
-                {
-                    if (passentSquare == destSquare)
-                    {
-                        legalmoves.Add(new Move(square, destSquare));
-                    } else if (((Squares[destSquare] != Piece.None) && GetPieceColor(destSquare) != myColor))
-                    {
-                        legalmoves.Add(new Move(square, destSquare));
-                    }
-                }
-            }
-        }
-        else
-        {
-            //Sliding type move behavior
-            //Iterate through directions
-            
-            for (int i = 0; i < 8; i++)
-            {
-                bool lat = i % 2 == 0;
-                if (Piece.IsType(piece, Piece.Queen) || Piece.IsType(piece, Piece.King) || (lat && Piece.IsType(piece, Piece.Rook)) || (!lat && Piece.IsType(piece, Piece.Bishop)))
-                {
-                    int maxDist = Piece.IsType(piece, Piece.King) ? 1 : 8;
-                    attackedLine.Clear();
-                    //Iterate along a direction here
-                    int hits = 0;
-                    for (int j = 1; j < Mathf.Min(Constants.EdgeDistanceArray[square, i], maxDist) + 1; j++)
-                    {
-                        int boardPos = square + (Constants.DirectionToOffset(i) * j);
-                        int destpiece = Squares[boardPos];
-
-                        //First, check if a piece occupies this square
-                        if (destpiece != Piece.None)
-                        {
-                            if (GetPieceColor(boardPos) == turn)
-                            {
-                                //Our own piece, cant get past no matter what.
-                                if (hits > 1)
-                                {
-                                    break;
-                                }
-                            }
-                            //If already added capture move, skip this and start looking for another piece behind this piece
-                            if (hits == 0 && GetPieceColor(boardPos) != turn)
-                            {
-                                //Add capture move
-                                legalmoves.Add(new Move(square, boardPos));
-                                
-                                //Look for Check
-                                if (Piece.IsType(destpiece, Piece.King))
-                                {
-                                    if (turn)
-                                    {
-                                        blackChecks.AddRange(attackedLine);
-                                        blackChecks.Add(square);
-                                    }
-                                    else
-                                    {
-                                        whiteChecks.AddRange(attackedLine);
-                                        whiteChecks.Add(square);
-                                    }
-                                }
-                            }
-                            else if (hits <= 2)
-                            {
-                                //If piece after last piece is a king, we found our pin.
-                                if (Piece.IsType(destpiece, Piece.King) && (GetPieceColor(boardPos) != turn))
-                                {
-                                    if (turn)
-                                    {
-                                        switch (hits)
-                                        {
-                                            case 1:
-                                                blackPins.AddRange(attackedLine);
-                                                blackPins.Add(square);
-                                                break;
-                                            case 2:
-                                                potentialBlackPins.Add(square);
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        switch (hits)
-                                        {
-                                            case 1:
-                                                whitePins.AddRange(attackedLine);
-                                                whitePins.Add(square);
-                                                break;
-                                            case 2:
-                                                potentialWhitePins.Add(square);
-                                                break;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                break;
-                            }
-                            hits++;
-                        }
-                        //Empty square, add this move
-                        else
-                        {
-                            //Make sure we arent now looking for pins, as those aren't legal moves.
-                            if (hits == 0) legalmoves.Add(new Move(square, boardPos));
-                        }
-                        attackedLine.Add(boardPos);
-                    }
-                }
-            }
-            //Evaluate castling
-            if (Piece.IsType(piece, Piece.King))
-            {
-                //Black castling
-                if (myColor && (castling_bk || castling_bq))
-                {
-                    if (castling_bk)
-                    {
-                        if (Squares[square + 1] == Piece.None && Squares[square + 2] == Piece.None)
-                        {
-                            legalmoves.Add(new Move(square,square + 2));
-                        }
-                    }
-                    if (castling_bq)
-                    {
-                        if (Squares[square - 1] == Piece.None && Squares[square - 2] == Piece.None && Squares[square - 3] == Piece.None)
-                        {
-                            legalmoves.Add(new Move(square,square - 2));
-                        }
-                    }
-                }
-                //White Castling
-                else if (!myColor && (castling_wk || castling_wq))
-                {
-                    if (castling_wk)
-                    {
-                        if (Squares[square + 1] == Piece.None && Squares[square + 2] == Piece.None)
-                        {
-                            legalmoves.Add(new Move(square,square + 2));
-                        }
-                    }
-                    if (castling_wq)
-                    {
-                        if (Squares[square - 1] == Piece.None && Squares[square - 2] == Piece.None && Squares[square - 3] == Piece.None)
-                        {
-                            legalmoves.Add(new Move(square,square - 2));
-                        }
-                    }
-                }
-            }
-        }
-
-        List<Move> filteredMoves = new List<Move>();
-        //Finally check for pins
-        if (turn && whitePins.Count > 0)
-        {
-            foreach (Move move in legalmoves)
-            {
-                if (!whitePins.Contains(move.StartSquare) || (whitePins.Contains(move.StartSquare) && whitePins.Contains(move.DestinationSquare)))
-                {
-                    filteredMoves.Add(move);
-                }
-            } 
-            legalmoves = filteredMoves.ToList();
-        }
-        if (!turn && blackPins.Count > 0)
-        {
-            foreach (Move move in legalmoves)
-            {
-                if (!blackPins.Contains(move.StartSquare) || (blackPins.Contains(move.StartSquare) && blackPins.Contains(move.DestinationSquare)))
-                {
-                    filteredMoves.Add(move);
-                }
-            }
-            legalmoves = filteredMoves.ToList();
-        }
-        
-        //Checks
-        if (turn && whiteChecks.Count > 0)
-        {
-            foreach (Move move in legalmoves)
-            {
-                if ((!Piece.IsType(Squares[move.StartSquare], Piece.King) && whiteChecks.Contains(move.DestinationSquare)) || (Piece.IsType(Squares[move.StartSquare], Piece.King) && !whiteChecks.Contains(move.DestinationSquare)))
-                {
-                    filteredMoves.Add(move);
-                }
-            }
-            legalmoves = filteredMoves.ToList();
-        }
-        if (!turn && blackChecks.Count > 0)
-        {
-            foreach (Move move in legalmoves)
-            {
-                if ((!Piece.IsType(Squares[move.StartSquare], Piece.King) && blackChecks.Contains(move.DestinationSquare)) || (Piece.IsType(Squares[move.StartSquare], Piece.King) && !blackChecks.Contains(move.DestinationSquare)))
-                {
-                    filteredMoves.Add(move);
-                }
-            }
-            legalmoves = filteredMoves.ToList();
-        }
-
-
-        return legalmoves;
-    }
-
     
 
     public MoveResult MakeMove(Move move, bool sendEvent = true)
@@ -455,7 +149,7 @@ public class Board
         {
             foreach (int sqr in potentialBlackPins.ToList())
             {
-                GetLegalMovesFromSquare(sqr);
+                //GetLegalMovesFromSquare(sqr);
             }
             //Clear opponents pins
             whitePins.Clear();
@@ -466,7 +160,7 @@ public class Board
         {
             foreach (int sqr in potentialWhitePins.ToList())
             {
-                GetLegalMovesFromSquare(sqr);
+                //GetLegalMovesFromSquare(sqr);
             }
             //Clear opponents pins
             potentialBlackPins.Clear();
@@ -475,13 +169,12 @@ public class Board
         }
         
         //Now evaluate new attacks
-        GetLegalMovesFromSquare(move.DestinationSquare);
+        //GetLegalMovesFromSquare(move.DestinationSquare);
 
         //Finally, add move to records and update turn.
         moves.Add(result);
         if (sendEvent) GameState.UpdateBoard();
         turn = !turn;
-        GetAllLegalMoves();
         return result;
     }
 
@@ -554,7 +247,7 @@ public class Board
     {
         MoveResult result = new MoveResult();
         result.move = move;
-        if (GetPieceColor(move.StartSquare) == turn && GetLegalMovesFromSquare(move.StartSquare).Contains(move))
+        if (GetPieceColor(move.StartSquare) == turn && MoveGenerator.GetAllLegalMoves(this).Contains(move))
         {
             result = MakeMove(move);
             result.legal = true;

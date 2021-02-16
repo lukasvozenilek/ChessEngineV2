@@ -8,7 +8,9 @@ public struct PERFTConfig
 {
     public string FEN;
     public List<long> requirements;
+    public int depth;
 }
+
 public static class PERFT
 {
 
@@ -22,21 +24,20 @@ public static class PERFT
         board = new Board();
         float startTime = Time.realtimeSinceStartup;
         int result;
-        int i = 0;
         bool passed = true;
         long totalevals = 0;
-        foreach (int requirement in config.requirements)
+        for (int i = 0; i < Mathf.Min(config.requirements.Count,config.depth+1); i++)
         {
+            long requirement = config.requirements[i];
             PERFTDivideResults.Clear();
             result = testdepth(i, i);
             totalevals += result;
             passed = result == requirement;
-            Debug.Log("DEPTH " + i + ": " + result + ", REQUIREMENT: " + requirement + (passed?" PASSED" : " FAILED"));
             foreach (KeyValuePair<string, int> KVP in PERFTDivideResults)
             {
                 Debug.Log(KVP.Key + ": " + KVP.Value);
             }
-            i++;
+            Debug.Log("DEPTH " + i + ": " + result + ", REQUIREMENT: " + requirement + (passed?" PASSED" : " FAILED"));
         }
         float elapsedTime = Time.realtimeSinceStartup - startTime;
         Debug.Log("Duration: " +  elapsedTime);
@@ -51,7 +52,7 @@ public static class PERFT
             return 1;
         }
         int nodes = 0;
-        List<Move> moves = board.GetAllLegalMoves();
+        List<Move> moves = MoveGenerator.GetAllLegalMoves(board).ToList();
         foreach (Move move in moves)
         {
             board.MakeMove(move, false);

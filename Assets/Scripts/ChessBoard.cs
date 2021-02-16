@@ -23,35 +23,29 @@ public class ChessBoard : MonoBehaviour
     
     public AudioSource audioSource;
 
+    public Board board = null;
+    
     void Start()
     {
         GameState.MainCamera = Camera.main;
-        
         audioSource = GetComponent<AudioSource>();
+    }
 
+    public void InitializeBoard(Board board)
+    {
+        this.board = board;
+        
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
         
         UpdateBoard();
-
         GameState.UpdateBoardEvent += UpdateBoard;
-        
-        PERFTConfig config1 = new PERFTConfig();
-        config1.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        //config1.requirements = new List<long>{1, 20, 400, 8902, 197281, 4865609};
-        config1.requirements = new List<long>{1, 20, 400, 8902, 197281};
-        PERFT.RUN_PERFT(config1);
-        
-        //Board.Restart();
-
-        //StartCoroutine(testDepthSlowly());
     }
-    
+
     private void OnDestroy()
     {
         GameState.UpdateBoardEvent -= UpdateBoard;
     }
-
     
 
     public void UpdateBoard()
@@ -59,15 +53,15 @@ public class ChessBoard : MonoBehaviour
         ClearBoard();
         ClearOverlays();
         int pos = 0;
-        /*
-        foreach (int piece in Board.Squares)
+       
+        foreach (int piece in board.Squares)
         {
             if (piece != Piece.None)
             {
                 GameObject GO = Instantiate(piecePrefab);
                 pieces.Add(GO);
                 PieceGO pieceGO = GO.GetComponent<PieceGO>();
-                
+
                 //Calculate spawn position
                 Vector3 spawnpos = grid.CellToWorld(new Vector3Int(pos % 8, pos / 8, 0));
                 spawnpos += grid.cellSize / 2;
@@ -124,7 +118,6 @@ public class ChessBoard : MonoBehaviour
             pos++;
             
         }
-        */
     }
 
     public void ClearBoard()
@@ -195,22 +188,22 @@ public class ChessBoard : MonoBehaviour
         }
         if (Input.GetButtonDown("Undo Move"))
         {
-            //Board.UnmakeMove();
+            board.UnmakeMove();
         }
 
         if (Input.GetButtonDown("Legal Moves"))
         {
-            //CreateOverlayFromMoves(Board.GetAllLegalMoves());
+            //CreateOverlayFromMoves(board.GetAllLegalMoves());
         }
 
         if (Input.GetButtonDown("White Attacking Moves"))
         {
-            //CreateOverlayFromSquares(Board.whitePins);
+            CreateOverlayFromSquares(board.whitePins);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
-            //CreateOverlayFromSquares(Board.blackPins);
+            CreateOverlayFromSquares(board.blackPins);
         }
     }
 }
