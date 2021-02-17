@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class Minimax
 {
     private Board board;
+    private MoveGenerator moveGenerator;
     public Minimax(Board board)
     {
         this.board = board;
@@ -11,7 +12,7 @@ public class Minimax
 
     public MoveResult? PlayNextMove()
     {
-        List<Move> legalMoves = MoveGenerator.GetAllLegalMoves(board);
+        List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
         if (legalMoves.Count == 0)
         {
             return null;

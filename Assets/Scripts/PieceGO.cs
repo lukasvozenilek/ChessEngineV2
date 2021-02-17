@@ -9,6 +9,12 @@ public class PieceGO : MonoBehaviour
     public ChessBoard chessBoardComponent;
     public int startSquare;
     public int pieceID;
+
+    private MoveGenerator moveGenerator;
+    private void Start()
+    {
+        moveGenerator = new MoveGenerator();
+    }
     
     public void OnMouseDrag()
     {
@@ -20,7 +26,7 @@ public class PieceGO : MonoBehaviour
     {
         if (chessBoardComponent.board.GetPieceColor(startSquare) == chessBoardComponent.board.turn)
         {
-            List<Move> legalMoves = MoveGenerator.GetAllLegalMoves(chessBoardComponent.board).Where(move =>
+            List<Move> legalMoves = moveGenerator.GetAllLegalMoves(chessBoardComponent.board).Where(move =>
             {
                 return move.StartSquare == startSquare; 
             }).ToList();

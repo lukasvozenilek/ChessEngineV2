@@ -11,15 +11,23 @@ public struct PERFTConfig
     public int depth;
 }
 
-public static class PERFT
+public class PERFT
 {
 
-    public static Dictionary<string, int> PERFTDivideResults = new Dictionary<string, int>();
+    public Dictionary<string, int> PERFTDivideResults = new Dictionary<string, int>();
 
-    private static Board board;
-    
-    public static void RUN_PERFT(PERFTConfig config)
+    private Board board;
+    private MoveGenerator moveGenerator;
+
+    public PERFT()
     {
+        board = new Board();
+        moveGenerator = new MoveGenerator();
+    }
+    
+    public void RUN_PERFT(PERFTConfig config)
+    {
+
         Debug.Log("RUNNING PERFT TEST!");
         board = new Board(config.FEN);
         float startTime = Time.realtimeSinceStartup;
@@ -54,14 +62,14 @@ public static class PERFT
     private static int checkmates;
     
     
-    private static int testdepth(int depth, int startdepth)
+    private int testdepth(int depth, int startdepth)
     {
         if (depth == 0)
         {
             return 1;
         }
         int nodes = 0;
-        List<Move> moves = MoveGenerator.GetAllLegalMoves(board).ToList();
+        List<Move> moves = moveGenerator.GetAllLegalMoves(board).ToList();
         if (moves.Count == 0) checkmates++;
         foreach (Move move in moves)
         {

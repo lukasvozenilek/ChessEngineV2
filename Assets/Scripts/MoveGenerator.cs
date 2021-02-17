@@ -5,15 +5,15 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 
 
-public static class MoveGenerator
+public class MoveGenerator
 {
-    public static List<Move> legalMoves = new List<Move>();
-    public static List<int> attackedSquares = new List<int>();
-    public static List<int> checkedSquares = new List<int>();
-    public static List<int> pinnedSquares = new List<int>();
-    public static List<int> attackedLine = new List<int>();
+    public List<Move> legalMoves = new List<Move>();
+    public List<int> attackedSquares = new List<int>();
+    public List<int> checkedSquares = new List<int>();
+    public List<int> pinnedSquares = new List<int>();
+    public List<int> attackedLine = new List<int>();
 
-    public static void CalculateAttacks(Board board, bool player)
+    public void CalculateAttacks(Board board, bool player)
     {
         attackedSquares.Clear();
         checkedSquares.Clear();
@@ -90,9 +90,7 @@ public static class MoveGenerator
                                 (!lat && Piece.IsType(piece, Piece.Bishop)))
                             {
                                 //Iterate along a direction here
-                                //The following line causes memory leak... wierdly deosnt happen when calculating legal moves.
-                                //Constants.EdgeDistanceArray[square, direction] + 1
-                                for (int offset = 1; offset < 1; offset++)
+                                for (int offset = 1; offset < Constants.EdgeDistanceArray[square, direction] + 1; offset++)
                                 {
                                     int boardPos = square + (Constants.DirectionToOffset(direction) * offset);
                                     if (boardPos < 0 || boardPos > 63) continue;
@@ -158,7 +156,7 @@ public static class MoveGenerator
         }
     }
     
-    public static List<Move> GetAllLegalMoves(Board board)
+    public List<Move> GetAllLegalMoves(Board board)
     {
         legalMoves.Clear();
         CalculateAttacks(board, !board.turn);
@@ -440,7 +438,7 @@ public static class MoveGenerator
         return legalMoves;
     }
 
-    public static void AddPawnPromotion(Board board, Move move)
+    public void AddPawnPromotion(Board board, Move move)
     {
         if ((board.turn && (move.DestinationSquare / 8 == 0)) || !board.turn && (move.DestinationSquare / 8 == 7))
         {

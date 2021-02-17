@@ -21,11 +21,14 @@ public class Board
 
     public List<int> whitePieces = new List<int>();
     public List<int> blackPieces = new List<int>();
+
+    private MoveGenerator moveGenerator;
     
     public Board(string FEN = Constants.startingFEN)
     {
         Squares = new int[64];
         LoadPositionFromFEN(FEN);
+        moveGenerator = new MoveGenerator();
     }
 
     public void ResetCastlingRights()
@@ -285,7 +288,7 @@ public class Board
     {
         MoveResult result = new MoveResult();
         result.move = move;
-        if (GetPieceColor(move.StartSquare) == turn && MoveGenerator.GetAllLegalMoves(this).Contains(move))
+        if (GetPieceColor(move.StartSquare) == turn && moveGenerator.GetAllLegalMoves(this).Contains(move))
         {
             result = MakeMove(move);
             result.legal = true;

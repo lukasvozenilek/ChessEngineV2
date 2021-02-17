@@ -42,8 +42,10 @@ public class ChessBoard : MonoBehaviour
     private bool HumanPlayer;
     private bool AIPlayer;
     private Minimax minimax;
+    private MoveGenerator moveGenerator;
     public void StartNewGame(GameConfiguration gameconfig)
     {
+        moveGenerator = new MoveGenerator();
         board = new Board(gameconfig.startingFEN);
         board.LoadPositionFromFEN("8/8/5k2/8/3N4/4K3/8/8 w - - 0 1");
 
@@ -91,21 +93,21 @@ public class ChessBoard : MonoBehaviour
 
         if (Input.GetButtonDown("Legal Moves"))
         {
-            List<Move> moves = MoveGenerator.GetAllLegalMoves(board);
+            List<Move> moves = moveGenerator.GetAllLegalMoves(board);
             Debug.Log("Legal moves: " + moves.Count);
             CreateOverlayFromMoves(moves);
         }
 
         if (Input.GetButtonDown("White Attacking Moves"))
         {
-            MoveGenerator.CalculateAttacks(board, false);
-            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
+            moveGenerator.CalculateAttacks(board, false);
+            CreateOverlayFromSquares(moveGenerator.attackedSquares);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
-            MoveGenerator.CalculateAttacks(board, true);
-            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
+            moveGenerator.CalculateAttacks(board, true);
+            CreateOverlayFromSquares(moveGenerator.attackedSquares);
         }
         
         
@@ -248,8 +250,8 @@ public class ChessBoard : MonoBehaviour
         if (move.legal)
         {
             //Kinda nasty way to find if a check took place but meh
-            MoveGenerator.CalculateAttacks(board,!board.turn);
-            if (MoveGenerator.checkedSquares.Count > 0)
+            moveGenerator.CalculateAttacks(board,!board.turn);
+            if (moveGenerator.checkedSquares.Count > 0)
             {
                 audioSource.PlayOneShot(boardConfig.checkSound);
             } else if (move.castle)

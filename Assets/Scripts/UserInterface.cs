@@ -20,12 +20,15 @@ namespace DefaultNamespace
         public TMP_Dropdown player1dropdown;
         public TMP_Dropdown player2dropdown;
 
+        private PERFT perft;
 
         public void Start()
         {
             runPERFTButton.onClick.AddListener(RunPERFT);
             newGameButton.onClick.AddListener(StartNewGame);
             testGameButton.onClick.AddListener(StartTestGame);
+            
+            perft = new PERFT();
         }
 
         public void StartNewGame()
@@ -65,7 +68,7 @@ namespace DefaultNamespace
                 config3
             };
 
-            PERFT.RUN_PERFT(configs[perftConfigDropdown.value]);
+            perft.RUN_PERFT(configs[perftConfigDropdown.value]);
         }
     }
 }
