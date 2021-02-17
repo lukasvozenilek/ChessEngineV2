@@ -90,18 +90,18 @@ public static class MoveGenerator
                                 (!lat && Piece.IsType(piece, Piece.Bishop)))
                             {
                                 //Iterate along a direction here
-                                for (int offset = 1; offset < Constants.EdgeDistanceArray[square, direction] + 1; offset++)
+                                //The following line causes memory leak... wierdly deosnt happen when calculating legal moves.
+                                //Constants.EdgeDistanceArray[square, direction] + 1
+                                for (int offset = 1; offset < 1; offset++)
                                 {
                                     int boardPos = square + (Constants.DirectionToOffset(direction) * offset);
                                     if (boardPos < 0 || boardPos > 63) continue;
                                     int destpiece = board.Squares[boardPos];
                                     
-                                    
                                     //First, check if a piece occupies this square
                                     if (destpiece != Piece.None)
                                     {
                                         if (!hit) attackedSquares.Add(boardPos);
-                                        
                                         //If our piece, stop here as no checks or pins can occur.
                                         if (board.GetPieceColor(boardPos) == player) break;
                                         
@@ -308,26 +308,30 @@ public static class MoveGenerator
                     case Piece.King:
                         for (int direction = 0; direction < 8; direction++)
                         {
-                            int boardPos = square + Constants.DirectionToOffset(direction);
-                            if (attackedSquares.Contains(boardPos)) continue;
-                            if (boardPos < 0 || boardPos > 63) continue;
-                            int destpiece = board.Squares[boardPos];
-
-                            //First, check if a piece occupies this square
-                            if (destpiece != Piece.None)
+                            if (Constants.EdgeDistanceArray[square, direction] >= 1)
                             {
-                                if (board.GetPieceColor(boardPos) == board.turn)
+                                int boardPos = square + Constants.DirectionToOffset(direction);
+                                if (attackedSquares.Contains(boardPos)) continue;
+                                if (boardPos < 0 || boardPos > 63) continue;
+                                int destpiece = board.Squares[boardPos];
+
+                                //First, check if a piece occupies this square
+                                if (destpiece != Piece.None)
                                 {
-                                    //Our own piece, cant get past no matter what.
+                                    if (board.GetPieceColor(boardPos) == board.turn)
+                                    {
+                                        //Our own piece, cant get past no matter what.
+                                        continue;
+                                    }
+
+                                    //Enemy piece, so capture
+                                    legalMoves.Add(new Move(square, boardPos));
+                                    //We break here, as no legal moves past a capture
                                     continue;
                                 }
 
-                                //Enemy piece, so capture
                                 legalMoves.Add(new Move(square, boardPos));
-                                //We break here, as no legal moves past a capture
-                                continue;
                             }
-                            legalMoves.Add(new Move(square, boardPos));
                         }
                         //Black castling
                         if (myColor && (board.castling_bk || board.castling_bq))

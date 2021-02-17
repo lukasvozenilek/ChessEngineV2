@@ -45,6 +45,7 @@ public class ChessBoard : MonoBehaviour
     public void StartNewGame(GameConfiguration gameconfig)
     {
         board = new Board(gameconfig.startingFEN);
+        board.LoadPositionFromFEN("8/8/5k2/8/3N4/4K3/8/8 w - - 0 1");
 
         AIPlayer = gameconfig.player2type == PlayerType.AI;
         
