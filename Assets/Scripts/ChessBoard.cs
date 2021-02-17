@@ -81,6 +81,7 @@ public class ChessBoard : MonoBehaviour
         */
         
         
+        
         if (Input.GetButtonDown("Jump"))
         {
             GameState.BlackPerspective = !GameState.BlackPerspective;
@@ -253,7 +254,7 @@ public class ChessBoard : MonoBehaviour
         {
             //Kinda nasty way to find if a check took place but meh
             moveGenerator.CalculateAttacks(board,!board.turn);
-            if (moveGenerator.checkedSquares.Count > 0)
+            if (moveGenerator.checkSquaresBB > 0)
             {
                 audioSource.PlayOneShot(boardConfig.checkSound);
             } else if (move.castle)
