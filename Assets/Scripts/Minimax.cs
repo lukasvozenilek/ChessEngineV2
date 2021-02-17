@@ -8,6 +8,7 @@ public class Minimax
     public Minimax(Board board)
     {
         this.board = board;
+        moveGenerator = new MoveGenerator();
     }
 
     public MoveResult? PlayNextMove()

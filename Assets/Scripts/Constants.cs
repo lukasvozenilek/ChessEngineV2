@@ -30,20 +30,20 @@ public static class Constants
     };
 
     public static int[,] EdgeDistanceArray;
-    public static ulong[] posToBBArray;
+    public static long[] posToBBArray;
     
     
     static Constants()
     {
         EdgeDistanceArray = new int[64,8];
-        posToBBArray = new ulong[64];
+        posToBBArray = new long[64];
 
         for (int i = 0; i < 64; i++)
         {
             int file = i % 8;
             int rank = i / 8;
 
-            posToBBArray[i] = (ulong) 1 << i;
+            posToBBArray[i] = (long) 1 << i;
             EdgeDistanceArray[i, 0] = 7 - rank;
             EdgeDistanceArray[i, 1] = Mathf.Min(7 - rank, 7 - file);
             EdgeDistanceArray[i, 2] = 7 - file;

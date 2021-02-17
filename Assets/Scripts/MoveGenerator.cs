@@ -1,13 +1,17 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-
 public class MoveGenerator
 {
     public List<Move> legalMoves = new List<Move>();
+    
+    public long attackSquaresBB = 0;
+    public long checkSquaresBB = 0;
+    public long pinnedSquaresBB = 0;
+    public long attackedLineBB = 0;
+    
     public List<int> attackedSquares = new List<int>();
     public List<int> checkedSquares = new List<int>();
     public List<int> pinnedSquares = new List<int>();
@@ -15,10 +19,16 @@ public class MoveGenerator
 
     public void CalculateAttacks(Board board, bool player)
     {
-        attackedSquares.Clear();
-        checkedSquares.Clear();
-        pinnedSquares.Clear();
+        //attackedSquares.Clear();
+        //checkedSquares.Clear();
+        //pinnedSquares.Clear();
 
+        attackSquaresBB = 0;
+        checkSquaresBB = 0;
+        pinnedSquaresBB = 0;
+        attackedLineBB = 0;
+        
+        
         int destSquare;
         for (int square = 0; square < 64; square++)
         {
@@ -47,10 +57,13 @@ public class MoveGenerator
                                     {
                                         destSquare = intermedSquare + Constants.DirectionToOffset(i_perp);
                                         int attackedPiece = board.Squares[destSquare];
-                                        attackedSquares.Add(destSquare);
+
+                                        attackSquaresBB |= Constants.posToBBArray[square];
+                                        //attackedSquares.Add(destSquare);
                                         if (Piece.IsType(attackedPiece, Piece.King) && (board.GetPieceColor(destSquare) != player))
                                         {
-                                            checkedSquares.Add(square);
+                                            checkSquaresBB |= Constants.posToBBArray[square];
+                                            //checkedSquares.Add(square);
                                         }
                                     }
                                 }
@@ -70,9 +83,11 @@ public class MoveGenerator
                             if (destSquare > 63 || destSquare < 0) continue;
                             if (Piece.IsType(board.Squares[destSquare], Piece.King) && board.GetPieceColor(destSquare) != player)
                             {
-                                checkedSquares.Add(destSquare);
+                                checkSquaresBB |= Constants.posToBBArray[destSquare];
+                                //checkedSquares.Add(destSquare);
                             }
-                            attackedSquares.Add(destSquare);
+                            attackSquaresBB |= Constants.posToBBArray[destSquare];
+                            //attackedSquares.Add(destSquare);
                         }
                         break;
                     case Piece.Rook:
@@ -81,7 +96,8 @@ public class MoveGenerator
                         for (int direction = 0; direction < 8; direction++)
                         {
                             bool lat = direction % 2 == 0;
-                            attackedLine.Clear();
+                            //attackedLine.Clear();
+                            attackedLineBB = 0;
                             bool hit = false;
                             bool kinghit = false;
                             
@@ -99,7 +115,8 @@ public class MoveGenerator
                                     //First, check if a piece occupies this square
                                     if (destpiece != Piece.None)
                                     {
-                                        if (!hit) attackedSquares.Add(boardPos);
+                                        if (!hit) attackSquaresBB |= Constants.posToBBArray[boardPos];
+                                        //if (!hit) attackedSquares.Add(boardPos);
                                         //If our piece, stop here as no checks or pins can occur.
                                         if (board.GetPieceColor(boardPos) == player) break;
                                         
@@ -107,18 +124,23 @@ public class MoveGenerator
                                         {
                                             if (!hit)
                                             {
-                                                checkedSquares.AddRange(attackedLine);
-                                                checkedSquares.Add(square);
+                                                checkSquaresBB |= attackedLineBB;
+                                                checkSquaresBB |= Constants.posToBBArray[square]; 
+                                                //checkedSquares.AddRange(attackedLine);
+                                                //checkedSquares.Add(square);
                                                 if (kinghit)
                                                 {
-                                                    attackedSquares.Add(boardPos);
+                                                    //attackedSquares.Add(boardPos);
+                                                    attackSquaresBB |= Constants.posToBBArray[boardPos];
                                                     break;
                                                 }
                                             }
                                             else
                                             {
-                                                pinnedSquares.AddRange(attackedLine);
-                                                pinnedSquares.Add(square);
+                                                pinnedSquaresBB |= attackedLineBB;
+                                                pinnedSquaresBB |= Constants.posToBBArray[square]; 
+                                                //pinnedSquares.AddRange(attackedLine);
+                                                //pinnedSquares.Add(square);
                                                 break;
                                             }
                                             kinghit = true;
@@ -134,9 +156,11 @@ public class MoveGenerator
                                     }
                                     else
                                     {
-                                        if (!hit) attackedSquares.Add(boardPos); 
+                                        //if (!hit) attackedSquares.Add(boardPos); 
+                                        if (!hit) attackSquaresBB |= Constants.posToBBArray[boardPos];
                                     }
-                                    attackedLine.Add(boardPos);
+                                    //attackedLine.Add(boardPos);
+                                    attackedLineBB |= Constants.posToBBArray[boardPos];
                                 }
                             }
                         }
@@ -145,10 +169,11 @@ public class MoveGenerator
                         for (int direction = 0; direction < 8; direction++)
                         {
                             int boardPos = square + Constants.DirectionToOffset(direction);
-                            if (attackedSquares.Contains(boardPos)) continue;
+                            //if (attackedSquares.Contains(boardPos)) continue;
                             if (boardPos < 0 || boardPos > 63) continue;
                             int destpiece = board.Squares[boardPos];
-                            attackedSquares.Add(boardPos);
+                            attackSquaresBB |= Constants.posToBBArray[boardPos];
+                            //attackedSquares.Add(boardPos);
                         }
                         break;
                 }
@@ -309,7 +334,7 @@ public class MoveGenerator
                             if (Constants.EdgeDistanceArray[square, direction] >= 1)
                             {
                                 int boardPos = square + Constants.DirectionToOffset(direction);
-                                if (attackedSquares.Contains(boardPos)) continue;
+                                if ((Constants.posToBBArray[boardPos] & attackSquaresBB) > 0) continue;
                                 if (boardPos < 0 || boardPos > 63) continue;
                                 int destpiece = board.Squares[boardPos];
 
@@ -401,40 +426,42 @@ public class MoveGenerator
                         break;
                     }
             }
-            
-            List<Move> filteredMoves = new List<Move>();
-            //Pins
-            if (pinnedSquares.Count > 0)
-            {
-                foreach (Move move in legalMoves)
-                {
-                    //King can always move behind a pin
-                    if (Piece.IsType(board.Squares[move.StartSquare], Piece.King) || (!pinnedSquares.Contains(move.StartSquare) || (pinnedSquares.Contains(move.StartSquare) && pinnedSquares.Contains(move.DestinationSquare))))
-                    {
-                        filteredMoves.Add(move);
-                    }
-                }
-                legalMoves = filteredMoves.ToList();
-            }
-
-            //Checks
-            if (checkedSquares.Count > 0)
-            {
-                foreach (Move move in legalMoves)
-                {
-                    if (!Piece.IsType(board.Squares[move.StartSquare], Piece.King) &&
-                         checkedSquares.Contains(move.DestinationSquare) ||
-                        Piece.IsType(board.Squares[move.StartSquare], Piece.King) &&
-                         (!checkedSquares.Contains(move.DestinationSquare) || board.Squares[move.DestinationSquare] != Piece.None))
-                    {
-                        filteredMoves.Add(move);
-                    }
-                }
-
-                legalMoves = filteredMoves.ToList();
-            }
-            
         }
+        
+        List<Move> filteredMoves = new List<Move>();
+        //Pins
+        if (pinnedSquaresBB > 0)
+        {
+            foreach (Move move in legalMoves)
+            {
+                bool startSquareInPin = (Constants.posToBBArray[move.StartSquare] & pinnedSquaresBB) > 0;
+                bool endSquareInPin = (Constants.posToBBArray[move.DestinationSquare] & pinnedSquaresBB) > 0;
+                if (Piece.IsType(board.Squares[move.StartSquare], Piece.King) || ((!startSquareInPin) || ((startSquareInPin) && endSquareInPin)))
+                {
+                    filteredMoves.Add(move);
+                }
+            }
+            legalMoves = filteredMoves.ToList();
+        }
+
+        //Checks
+        if (checkSquaresBB > 0)
+        {
+            foreach (Move move in legalMoves)
+            {
+                bool destinationUnderCheck = (Constants.posToBBArray[move.DestinationSquare] & checkSquaresBB) > 0;
+                if (!Piece.IsType(board.Squares[move.StartSquare], Piece.King) &&
+                    destinationUnderCheck ||
+                    Piece.IsType(board.Squares[move.StartSquare], Piece.King) &&
+                     (!destinationUnderCheck || board.Squares[move.DestinationSquare] != Piece.None))
+                {
+                    filteredMoves.Add(move);
+                }
+            }
+
+            legalMoves = filteredMoves.ToList();
+        }
+
         return legalMoves;
     }
 

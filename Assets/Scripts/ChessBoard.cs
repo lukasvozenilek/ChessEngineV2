@@ -47,7 +47,6 @@ public class ChessBoard : MonoBehaviour
     {
         moveGenerator = new MoveGenerator();
         board = new Board(gameconfig.startingFEN);
-        board.LoadPositionFromFEN("8/8/5k2/8/3N4/4K3/8/8 w - - 0 1");
 
         AIPlayer = gameconfig.player2type == PlayerType.AI;
         
@@ -61,6 +60,7 @@ public class ChessBoard : MonoBehaviour
     
     private void Update()
     {
+        /*
         if (PlayingGame)
         {
             if (board.turn == AIPlayer)
@@ -78,6 +78,7 @@ public class ChessBoard : MonoBehaviour
                 UpdateBoard();
             }
         }
+        */
         
         
         if (Input.GetButtonDown("Jump"))
@@ -101,13 +102,15 @@ public class ChessBoard : MonoBehaviour
         if (Input.GetButtonDown("White Attacking Moves"))
         {
             moveGenerator.CalculateAttacks(board, false);
-            CreateOverlayFromSquares(moveGenerator.attackedSquares);
+            //CreateOverlayFromSquares(moveGenerator.attackedSquares);
+            CreateOverlayFromBB(moveGenerator.attackSquaresBB);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
             moveGenerator.CalculateAttacks(board, true);
-            CreateOverlayFromSquares(moveGenerator.attackedSquares);
+            //CreateOverlayFromSquares(moveGenerator.attackedSquares);
+            CreateOverlayFromBB(moveGenerator.attackSquaresBB);
         }
         
         
@@ -205,13 +208,12 @@ public class ChessBoard : MonoBehaviour
         GO.transform.position = spawnpos;
     }
 
-    public void CreateOverlayFromBB(ulong bb)
+    public void CreateOverlayFromBB(long bb)
     {
         ClearOverlays();
-        //Debug.Log( Convert.ToString((long)bb, 2));
         for (int i = 0; i < 64; i++)
         {
-            ulong mask = (ulong)1 << i;
+            long mask = (long)1 << i;
             if ((mask & bb) >= 1)
             {
                 CreateOverlay(i);
