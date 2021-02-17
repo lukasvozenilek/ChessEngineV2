@@ -29,23 +29,88 @@ public class ChessBoard : MonoBehaviour
     {
         GameState.MainCamera = Camera.main;
         audioSource = GetComponent<AudioSource>();
-    }
-
-    public void StartNewGame(GameConfiguration gameconfig)
-    {
-        board = new Board(gameconfig.startingFEN);
-        
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
-        
-        UpdateBoard();
-        GameState.UpdateBoardEvent += UpdateBoard;
     }
-
+    
     private void OnDestroy()
     {
         GameState.UpdateBoardEvent -= UpdateBoard;
     }
+
+    private bool PlayingGame;
+    private bool HumanPlayer;
+    private bool AIPlayer;
+    private Minimax minimax;
+    public void StartNewGame(GameConfiguration gameconfig)
+    {
+        board = new Board(gameconfig.startingFEN);
+
+        AIPlayer = gameconfig.player2type == PlayerType.AI;
+        
+        minimax = new Minimax(board);
+        
+        PlayingGame = true;
+        
+        UpdateBoard();
+        GameState.UpdateBoardEvent += UpdateBoard;
+    }
+    
+    private void Update()
+    {
+        if (PlayingGame)
+        {
+            if (board.turn == AIPlayer)
+            {
+                MoveResult? result = minimax.PlayNextMove();
+                if (result == null)
+                {
+                    Debug.Log("Checkmate!");
+                    PlayingGame = false;
+                }
+                else
+                {
+                    PlayAudioFromMove((MoveResult)result);
+                }
+                UpdateBoard();
+            }
+        }
+        
+        
+        if (Input.GetButtonDown("Jump"))
+        {
+            GameState.BlackPerspective = !GameState.BlackPerspective;
+            UpdateBoard();
+        }
+        if (Input.GetButtonDown("Undo Move"))
+        {
+            board.UnmakeMove();
+            UpdateBoard();
+        }
+
+        if (Input.GetButtonDown("Legal Moves"))
+        {
+            List<Move> moves = MoveGenerator.GetAllLegalMoves(board);
+            Debug.Log("Legal moves: " + moves.Count);
+            CreateOverlayFromMoves(moves);
+        }
+
+        if (Input.GetButtonDown("White Attacking Moves"))
+        {
+            MoveGenerator.CalculateAttacks(board, false);
+            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
+        }
+        
+        if (Input.GetButtonDown("Black Attacking Moves"))
+        {
+            MoveGenerator.CalculateAttacks(board, true);
+            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
+        }
+        
+        
+    }
+
+  
 
     public void UpdateBoard()
     {
@@ -177,36 +242,29 @@ public class ChessBoard : MonoBehaviour
     }
 
 
-    private void Update()
+    public void PlayAudioFromMove(MoveResult move)
     {
-        if (Input.GetButtonDown("Jump"))
+        if (move.legal)
         {
-            GameState.BlackPerspective = !GameState.BlackPerspective;
-            UpdateBoard();
-        }
-        if (Input.GetButtonDown("Undo Move"))
-        {
-            board.UnmakeMove();
-            UpdateBoard();
-        }
-
-        if (Input.GetButtonDown("Legal Moves"))
-        {
-            List<Move> moves = MoveGenerator.GetAllLegalMoves(board);
-            Debug.Log("Legal moves: " + moves.Count);
-            CreateOverlayFromMoves(moves);
-        }
-
-        if (Input.GetButtonDown("White Attacking Moves"))
-        {
-            MoveGenerator.CalculateAttacks(board, false);
-            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
-        }
-        
-        if (Input.GetButtonDown("Black Attacking Moves"))
-        {
-            MoveGenerator.CalculateAttacks(board, true);
-            CreateOverlayFromSquares(MoveGenerator.attackedSquares);
+            //Kinda nasty way to find if a check took place but meh
+            MoveGenerator.CalculateAttacks(board,!board.turn);
+            if (MoveGenerator.checkedSquares.Count > 0)
+            {
+                audioSource.PlayOneShot(boardConfig.checkSound);
+            } else if (move.castle)
+            {
+                audioSource.PlayOneShot(boardConfig.castleSound);
+            }
+            else if (move.capture)
+            {
+                audioSource.PlayOneShot(boardConfig.captureSound);
+            }
+            else
+            {
+                audioSource.PlayOneShot(boardConfig.moveSound);
+            }
         }
     }
+
+    
 }

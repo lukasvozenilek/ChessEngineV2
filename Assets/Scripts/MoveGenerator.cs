@@ -138,7 +138,6 @@ public static class MoveGenerator
                                     {
                                         if (!hit) attackedSquares.Add(boardPos); 
                                     }
-                                    
                                     attackedLine.Add(boardPos);
                                 }
                             }

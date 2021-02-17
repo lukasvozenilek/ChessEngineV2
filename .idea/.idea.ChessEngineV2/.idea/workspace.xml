@@ -37,15 +37,16 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/PERFT.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/BoardConfig.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/MoveGenerator.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Move.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluation.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameConfiguration.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Minimax.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MoveGenerator.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
       </list>
     </option>
   </component>
@@ -107,7 +108,8 @@
       <workItem from="1613495095698" duration="10840000" />
       <workItem from="1613508636855" duration="6377000" />
       <workItem from="1613519204655" duration="898000" />
-      <workItem from="1613520495685" duration="6097000" />
+      <workItem from="1613520495685" duration="8024000" />
+      <workItem from="1613529305214" duration="579000" />
     </task>
     <servers />
   </component>

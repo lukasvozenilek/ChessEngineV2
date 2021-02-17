@@ -90,6 +90,6 @@ public static class Constants
     
     public static string MoveToString(Move move)
     {
-        return Constants.ConvertToCoord(move.StartSquare) + Constants.ConvertToCoord(move.DestinationSquare);
+        return ConvertToCoord(move.StartSquare) + ConvertToCoord(move.DestinationSquare);
     }
 }

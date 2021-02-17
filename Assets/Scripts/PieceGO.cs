@@ -50,26 +50,7 @@ public class PieceGO : MonoBehaviour
             }
             
             MoveResult moveResult = chessBoardComponent.board.RequestMove(new Move(startSquare, destinationSquare, promotionID));
-            if (moveResult.legal)
-            {
-                //Kinda nasty way to find if a check took place but meh
-                MoveGenerator.CalculateAttacks(chessBoardComponent.board,!chessBoardComponent.board.turn);
-                if (MoveGenerator.checkedSquares.Count > 0)
-                {
-                    chessBoardComponent.audioSource.PlayOneShot(chessBoardComponent.boardConfig.checkSound);
-                } else if (moveResult.castle)
-                {
-                    chessBoardComponent.audioSource.PlayOneShot(chessBoardComponent.boardConfig.castleSound);
-                }
-                else if (moveResult.capture)
-                {
-                    chessBoardComponent.audioSource.PlayOneShot(chessBoardComponent.boardConfig.captureSound);
-                }
-                else
-                {
-                    chessBoardComponent.audioSource.PlayOneShot(chessBoardComponent.boardConfig.moveSound);
-                }
-            }
+            chessBoardComponent.PlayAudioFromMove(moveResult);
             chessBoardComponent.UpdateBoard();
             
         }
