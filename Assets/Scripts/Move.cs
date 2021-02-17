@@ -23,3 +23,10 @@ public struct MoveResult
     public bool castle;
     public bool forfeitedCastling;
 }
+
+
+public struct CastlingRights
+{
+    public bool qs;
+    public bool ks;
+}

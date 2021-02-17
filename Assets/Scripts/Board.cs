@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -15,6 +15,9 @@ public class Board
     public bool castling_wq;
     public bool castling_bk;
     public bool castling_bq;
+
+    public event Action boardUpdatedEvent;
+    public event Action gameOverEvent;
 
     public List<int> whitePieces = new List<int>();
     public List<int> blackPieces = new List<int>();
@@ -120,11 +123,30 @@ public class Board
         MoveResult result = new MoveResult();
         result.move = move;
         
-        //Castling rights
-        if (move.StartSquare == 0 || move.StartSquare == 4) castling_wq = false;
-        if (move.StartSquare == 7 || move.StartSquare == 4) castling_wk = false;
-        if (move.StartSquare == 56 || move.StartSquare == 60) castling_bq = false;
-        if (move.StartSquare == 63 || move.StartSquare == 60) castling_bk = false;
+        //Losing castling rights due to king and rook moves.
+        if (castling_wq && (move.StartSquare == 0 || move.StartSquare == 4))
+        {
+            castling_wq = false;
+            result.forfeitedCastling = true;
+        }
+
+        if (castling_wk && (move.StartSquare == 7 || move.StartSquare == 4))
+        {
+            castling_wk = false;
+            result.forfeitedCastling = true;
+        }
+
+        if (castling_bq && (move.StartSquare == 56 || move.StartSquare == 60))
+        {
+            castling_bq = false;
+            result.forfeitedCastling = true;
+        }
+
+        if (castling_bk && (move.StartSquare == 63 || move.StartSquare == 60))
+        {
+            castling_bk = false;
+            result.forfeitedCastling = true;
+        }
 
         result.capturedPiece = Squares[move.DestinationSquare];
         result.capture = Squares[move.DestinationSquare] != Piece.None;
@@ -180,6 +202,11 @@ public class Board
             }
         }
 
+        if (move.promotionID != Piece.None)
+        {
+            Squares[move.DestinationSquare] = move.promotionID + (turn? Piece.Black : Piece.White);
+        }
+
         //Finally, add move to records and update turn.
         moves.Add(result);
         turn = !turn;
@@ -190,7 +217,16 @@ public class Board
     {
         if (moves.Count == 0) return;
         MoveResult lastMove = moves[moves.Count-1];
-        Squares[lastMove.move.StartSquare] = Squares[lastMove.move.DestinationSquare];
+
+        if (lastMove.move.promotionID != Piece.None)
+        {
+            Squares[lastMove.move.StartSquare] = Piece.Pawn + (turn ? Piece.White : Piece.Black);
+        }
+        else
+        {
+            Squares[lastMove.move.StartSquare] = Squares[lastMove.move.DestinationSquare];
+        }
+        
         if (lastMove.enpassant)
         {
             Squares[lastMove.move.DestinationSquare] = Piece.None;

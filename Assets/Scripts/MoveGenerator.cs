@@ -215,7 +215,7 @@ public static class MoveGenerator
                         {
                             if (board.Squares[destSquare] == Piece.None)
                             {
-                                legalMoves.Add(new Move(square, destSquare));
+                                AddPawnPromotion(board, new Move(square, destSquare));
                                 //Check if pawn on original square
                                 if ((square / 8 == 1 && !myColor) || square / 8 == 6 && myColor)
                                 {
@@ -239,6 +239,7 @@ public static class MoveGenerator
                                 {
                                     //If so, this is a legal en passent move.
                                     int offset = board.GetPieceColor(previousMove.DestinationSquare) ? -8 : 8;
+                                    
                                     passentSquare = previousMove.StartSquare + offset;
                                 }
                             }
@@ -262,10 +263,11 @@ public static class MoveGenerator
                                 else if (((board.Squares[destSquare] != Piece.None) &&
                                           board.GetPieceColor(destSquare) != myColor))
                                 {
-                                    legalMoves.Add(new Move(square, destSquare));
+                                    AddPawnPromotion(board, new Move(square, destSquare));
                                 }
                             }
                         }
+
                         break;
                     case Piece.Rook:
                     case Piece.Queen:
@@ -422,7 +424,7 @@ public static class MoveGenerator
                     if (!Piece.IsType(board.Squares[move.StartSquare], Piece.King) &&
                          checkedSquares.Contains(move.DestinationSquare) ||
                         Piece.IsType(board.Squares[move.StartSquare], Piece.King) &&
-                         !checkedSquares.Contains(move.DestinationSquare))
+                         (!checkedSquares.Contains(move.DestinationSquare) || board.Squares[move.DestinationSquare] != Piece.None))
                     {
                         filteredMoves.Add(move);
                     }
@@ -430,7 +432,23 @@ public static class MoveGenerator
 
                 legalMoves = filteredMoves.ToList();
             }
+            
         }
         return legalMoves;
+    }
+
+    public static void AddPawnPromotion(Board board, Move move)
+    {
+        if ((board.turn && (move.DestinationSquare / 8 == 0)) || !board.turn && (move.DestinationSquare / 8 == 7))
+        {
+            legalMoves.Add(new Move(move.StartSquare, move.DestinationSquare, Piece.Knight));
+            legalMoves.Add(new Move(move.StartSquare, move.DestinationSquare, Piece.Bishop));
+            legalMoves.Add(new Move(move.StartSquare, move.DestinationSquare, Piece.Queen));
+            legalMoves.Add(new Move(move.StartSquare, move.DestinationSquare, Piece.Rook));
+        }
+        else
+        {
+            legalMoves.Add(move);
+        }
     }
 }

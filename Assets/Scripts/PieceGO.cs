@@ -36,16 +36,20 @@ public class PieceGO : MonoBehaviour
         //Check bounds of chess board
         if (destinationPos.x >= 0 && destinationPos.x <= 7 && destinationPos.y >= 0 && destinationPos.y <= 7 && destinationSquare != startSquare)
         {
+            int promotionID = 0;
+            
             //Promotion
             if (Piece.IsType(pieceID, Piece.Pawn))
             {
                 if ((chessBoardComponent.board.turn && destinationPos.y == 0) || (!chessBoardComponent.board.turn && destinationPos.y == 7) )
                 {
-                    Debug.Log("Promotion!");
+                    //Here we would query the user for promotion piece.
+                    //For now, forcing queen promotion.
+                    promotionID = Piece.Queen;
                 }
             }
             
-            MoveResult moveResult = chessBoardComponent.board.RequestMove(new Move(startSquare, destinationSquare));
+            MoveResult moveResult = chessBoardComponent.board.RequestMove(new Move(startSquare, destinationSquare, promotionID));
             if (moveResult.legal)
             {
                 //Kinda nasty way to find if a check took place but meh

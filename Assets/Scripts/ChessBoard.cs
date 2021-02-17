@@ -31,9 +31,9 @@ public class ChessBoard : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    public void InitializeBoard(Board board)
+    public void StartNewGame(GameConfiguration gameconfig)
     {
-        this.board = board;
+        board = new Board(gameconfig.startingFEN);
         
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;

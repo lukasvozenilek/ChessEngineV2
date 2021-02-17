@@ -8,38 +8,64 @@ namespace DefaultNamespace
     public class UserInterface : MonoBehaviour
     {
         public ChessBoard chessBoardRef;
-        public Button runPERFT;
-        public TMP_InputField PERFTDepth;
+
+        [Header("PERFT")] public TMP_Dropdown perftConfigDropdown;
+        public Button runPERFTButton;
+        public TMP_InputField perftDepthInput;
+
+        [Header("Test Game")] public Button testGameButton;
+        public TMP_InputField FENInput;
+
+        [Header("New Game")] public Button newGameButton;
+        public TMP_Dropdown player1dropdown;
+        public TMP_Dropdown player2dropdown;
+
 
         public void Start()
         {
-            runPERFT.onClick.AddListener(RunPERFT);
-            
-            Board board = new Board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-            chessBoardRef.InitializeBoard(board);
+            runPERFTButton.onClick.AddListener(RunPERFT);
+            newGameButton.onClick.AddListener(StartNewGame);
+            testGameButton.onClick.AddListener(StartTestGame);
+        }
+
+        public void StartNewGame()
+        {
+            GameConfiguration config = new GameConfiguration(PlayerType.Human, PlayerType.AI);
+            chessBoardRef.StartNewGame(config);
+        }
+
+        public void StartTestGame()
+        {
+            GameConfiguration config = new GameConfiguration(PlayerType.Human, PlayerType.Human,
+                "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+            chessBoardRef.StartNewGame(config);
         }
 
         public void RunPERFT()
         {
             PERFTConfig config1 = new PERFTConfig();
             config1.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-            config1.requirements = new List<long>{1, 20, 400, 8902, 197281, 4865609};
-            config1.depth = int.Parse(PERFTDepth.text);
+            config1.requirements = new List<long> {1, 20, 400, 8902, 197281, 4865609};
+            config1.depth = int.Parse(perftDepthInput.text);
 
             PERFTConfig config2 = new PERFTConfig();
             config2.FEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
-            config2.requirements = new List<long>{1, 48, 2039, 97862, 4085603, 193690690};
-            config2.depth = int.Parse(PERFTDepth.text);
-            
+            config2.requirements = new List<long> {1, 48, 2039, 97862, 4085603, 193690690};
+            config2.depth = int.Parse(perftDepthInput.text);
+
             PERFTConfig config3 = new PERFTConfig();
             config3.FEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -";
-            config3.requirements = new List<long>{1, 14, 191, 2812, 43238, 674624};
-            config3.depth = int.Parse(PERFTDepth.text);
-            
-            
-            PERFT.RUN_PERFT(config3);
+            config3.requirements = new List<long> {1, 14, 191, 2812, 43238, 674624};
+            config3.depth = int.Parse(perftDepthInput.text);
+
+            PERFTConfig[] configs = new[]
+            {
+                config1,
+                config2,
+                config3
+            };
+
+            PERFT.RUN_PERFT(configs[perftConfigDropdown.value]);
         }
     }
-    
-    
 }
