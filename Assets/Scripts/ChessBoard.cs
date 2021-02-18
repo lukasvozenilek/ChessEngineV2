@@ -60,6 +60,7 @@ public class ChessBoard : MonoBehaviour
     
     private void Update()
     {
+        /*
         
         if (PlayingGame)
         {
@@ -79,6 +80,7 @@ public class ChessBoard : MonoBehaviour
                 UpdateBoard();
             }
         }
+        */
         
         
         

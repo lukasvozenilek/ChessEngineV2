@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -425,15 +426,36 @@ public class MoveGenerator
             {
                 if (Piece.IsType(board.Squares[move.StartSquare], Piece.King))
                 {
+                    //King can always move out of a pin.
                     filteredMoves.Add(move);
                 }
                 else 
                 {
+                    //This logic checks if the move's vector is in the same direction as the pin. This prevents
+                    //pinned pieces from taking other existing pins in different directions.
                     bool startSquareInPin = (Constants.posToBBArray[move.StartSquare] & pinnedSquaresBB) > 0;
                     bool endSquareInPin = (Constants.posToBBArray[move.DestinationSquare] & pinnedSquaresBB) > 0;
-                    int moveDirection = Mathf.Abs(move.DestinationSquare - move.StartSquare);
-                    int pinDirection = Mathf.Abs(move.StartSquare - pinnedKingSquare);
-                    bool moveWithinPin = ((moveDirection==pinDirection) || moveDirection%pinDirection==0 || pinDirection%moveDirection==0) && ((startSquareInPin) && endSquareInPin);
+                    
+                    //Calculate move vector and magnitude
+                    int moveVector_r = ((move.StartSquare / 8) - (move.DestinationSquare / 8));
+                    int moveVector_f = ((move.StartSquare % 8) - (move.DestinationSquare % 8));
+                    int moveVector_mag = Math.Max(Math.Abs(moveVector_f), Math.Abs(moveVector_r));
+                    
+                    //Calculate pin vector and magnitude
+                    int pinVector_r = ((move.StartSquare / 8) - (pinnedKingSquare / 8));
+                    int pinVector_f = ((move.StartSquare % 8) - (pinnedKingSquare % 8));
+                    int pinVector_mag = Math.Max(Math.Abs(pinVector_f), Math.Abs(pinVector_r));
+
+                    //Calculate if the two vectors match
+                    bool direction1Matches = (moveVector_r / moveVector_mag) == (pinVector_r / pinVector_mag) &&
+                                           (moveVector_f / moveVector_mag) == (pinVector_f / pinVector_mag);
+                    
+                    bool direction2Matches = (moveVector_r / moveVector_mag) == -(pinVector_r / pinVector_mag) &&
+                                             (moveVector_f / moveVector_mag) == -(pinVector_f / pinVector_mag);
+                    
+                    bool moveWithinPin = (direction1Matches||direction2Matches) && startSquareInPin && endSquareInPin;
+                    
+                    //Finally, move is legal if the piece isnt pinned, or it's moving within the pin.
                     if (((!startSquareInPin) || moveWithinPin))
                     {
                         filteredMoves.Add(move); 

@@ -8,6 +8,9 @@ public class Minimax
 {
     private Board board;
     private MoveGenerator moveGenerator;
+
+    private int movesPruned;
+    private int movesEvaluated;
     
     private const int worstEval = -10000;
     public const int bestEval = 10000;
@@ -19,6 +22,8 @@ public class Minimax
 
     public MoveResult? PlayNextMove()
     {
+        movesPruned = 0;
+        movesEvaluated = 0;
         List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
         if (legalMoves.Count == 0)
         {
@@ -39,6 +44,9 @@ public class Minimax
             Debug.Log("Move " + Constants.MoveToString(moveResult.Key) + " had eval of " + moveResult.Value);
         }
         
+        Debug.Log("Total moves evaluated: " + movesEvaluated);
+        Debug.Log("Total moves pruned: " + movesPruned);
+        
         Move bestMove = moveEvals.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
 
         return board.MakeMove(bestMove);
@@ -49,10 +57,12 @@ public class Minimax
         if (depthlept == 0)
         {
             int perspective = board.turn ? -1 : 1;
+            movesEvaluated += 1;
             return perspective * Evaluation.EvaluateBoard(board);
         }
         List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
-        if (legalMoves.Count == 0)
+        int totalMoves = legalMoves.Count;
+        if (totalMoves == 0)
         {
             //If in check, this is checkmate
             if (moveGenerator.checkSquaresBB > 0)
@@ -62,16 +72,32 @@ public class Minimax
             //Stalemate
             return 0;
         }
+
+        int i = 0;
         foreach (Move move in legalMoves.ToList())
         {
+            i++;
             board.MakeMove(move, false);
             int result = -Search(depthlept - 1, startdepth, -beta, -alpha);
             board.UnmakeMove();
-            if (result >= beta)
+            if (startdepth - depthlept % 2 == 0)
             {
-                return beta;
+                if (result <= alpha)
+                {
+                    movesPruned += totalMoves - i;
+                    return alpha;
+                }
+                beta = Math.Min(beta, result);
             }
-            alpha = Math.Max(alpha, result);
+            else
+            {
+                if (result >= beta)
+                {
+                    movesPruned += totalMoves - i;
+                    return beta;
+                }
+                alpha = Math.Max(alpha, result);
+            }
         }
         return alpha;
     }
