@@ -61,12 +61,12 @@ public class ChessBoard : MonoBehaviour
     private void Update()
     {
         
-        /*
         if (PlayingGame)
         {
             if (board.turn == AIPlayer)
             {
                 MoveResult? result = minimax.PlayNextMove();
+                Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));
                 if (result == null)
                 {
                     Debug.Log("Checkmate!");
@@ -79,7 +79,7 @@ public class ChessBoard : MonoBehaviour
                 UpdateBoard();
             }
         }
-        */
+        
         
         
         if (Input.GetButtonDown("Jump"))

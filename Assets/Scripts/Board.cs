@@ -238,7 +238,7 @@ public class Board
         {
             Squares[move.DestinationSquare] = move.promotionID + (turn? Piece.Black : Piece.White);
         }
-
+        
         //Finally, add move to records and update turn.
         moves.Add(result);
         turn = !turn;

@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Minimax
 {
     private Board board;
     private MoveGenerator moveGenerator;
+    
+    private const int worstEval = -10000;
+    public const int bestEval = 10000;
     public Minimax(Board board)
     {
         this.board = board;
@@ -18,7 +24,56 @@ public class Minimax
         {
             return null;
         }
-        return board.MakeMove(legalMoves[UnityEngine.Random.Range(0, legalMoves.Count)]);
+
+        Dictionary<Move, int> moveEvals = new Dictionary<Move, int>();
+        foreach (Move move in legalMoves.ToList())
+        {
+            board.MakeMove(move, false);
+            int eval = -Search(4, 3, worstEval, bestEval );
+            moveEvals.Add(move, eval);
+            board.UnmakeMove();
+        }
+
+        foreach (KeyValuePair<Move, int> moveResult in moveEvals)
+        {
+            Debug.Log("Move " + Constants.MoveToString(moveResult.Key) + " had eval of " + moveResult.Value);
+        }
+        
+        Move bestMove = moveEvals.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+
+        return board.MakeMove(bestMove);
+    }
+
+    private int Search(int depthlept, int startdepth, int alpha, int beta)
+    {
+        if (depthlept == 0)
+        {
+            int perspective = board.turn ? -1 : 1;
+            return perspective * Evaluation.EvaluateBoard(board);
+        }
+        List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
+        if (legalMoves.Count == 0)
+        {
+            //If in check, this is checkmate
+            if (moveGenerator.checkSquaresBB > 0)
+            {
+                return worstEval;
+            }
+            //Stalemate
+            return 0;
+        }
+        foreach (Move move in legalMoves.ToList())
+        {
+            board.MakeMove(move, false);
+            int result = -Search(depthlept - 1, startdepth, -beta, -alpha);
+            board.UnmakeMove();
+            if (result >= beta)
+            {
+                return beta;
+            }
+            alpha = Math.Max(alpha, result);
+        }
+        return alpha;
     }
 }
 
