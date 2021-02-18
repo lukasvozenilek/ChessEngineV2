@@ -41,17 +41,40 @@ public class ChessBoard : MonoBehaviour
     private bool PlayingGame;
     private bool HumanPlayer;
     private bool AIPlayer;
-    private Minimax minimax;
+
+    private Player whitePlayer;
+    private Player blackPlayer;
+    
     private MoveGenerator moveGenerator;
     public void StartNewGame(GameConfiguration gameconfig)
     {
         moveGenerator = new MoveGenerator();
         board = new Board(gameconfig.startingFEN);
 
-        AIPlayer = gameconfig.player2type == PlayerType.AI;
+        switch (gameconfig.player1type)
+        {
+            case PlayerType.Human:
+                whitePlayer = new HumanPlayer(board);
+                break;
+            case PlayerType.Minimax:
+                whitePlayer = new Minimax(board, 4);
+                break;
+            case PlayerType.MonteCarlo:
+                break;
+        }
         
-        minimax = new Minimax(board);
-        
+        switch (gameconfig.player2type)
+        {
+            case PlayerType.Human:
+                blackPlayer = new HumanPlayer(board);
+                break;
+            case PlayerType.Minimax:
+                blackPlayer = new Minimax(board, 4);
+                break;
+            case PlayerType.MonteCarlo:
+                break;
+        }
+
         PlayingGame = true;
         
         UpdateBoard();
@@ -60,28 +83,31 @@ public class ChessBoard : MonoBehaviour
     
     private void Update()
     {
-        /*
-        
-        if (PlayingGame)
+        if (PlayingGame && ((board.turn && !(blackPlayer is HumanPlayer)) || (!board.turn && !(whitePlayer is HumanPlayer))))
         {
-            if (board.turn == AIPlayer)
+            MoveResult? result;
+            if (board.turn)
             {
-                MoveResult? result = minimax.PlayNextMove();
-                Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));
-                if (result == null)
-                {
-                    Debug.Log("Checkmate!");
-                    PlayingGame = false;
-                }
-                else
-                {
-                    PlayAudioFromMove((MoveResult)result);
-                }
-                UpdateBoard();
+                result = blackPlayer.GetMove();
             }
+            else
+            {
+                result = whitePlayer.GetMove();
+            }
+            
+            Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));
+            if (result == null)
+            {
+                Debug.Log("Checkmate!");
+                PlayingGame = false;
+            }
+            else
+            {
+                PlayAudioFromMove((MoveResult)result);
+            }
+            UpdateBoard();
+            
         }
-        */
-        
         
         
         if (Input.GetButtonDown("Jump"))

@@ -1,10 +1,4 @@
 ﻿
-public enum PlayerType
-{
-    Human,
-    AI
-}
-
 public struct GameConfiguration
 {
     public PlayerType player1type;

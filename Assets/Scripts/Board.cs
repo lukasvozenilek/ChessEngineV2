@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class Board
 {
     //Board variables
@@ -35,6 +34,31 @@ public class Board
         LoadPositionFromFEN(FEN);
         moveGenerator = new MoveGenerator();
     }
+    
+    public Board(Board copyfrom)
+    {
+        //Copy current position
+        Squares = copyfrom.Squares;
+        
+        //Copy current and starting castling rights
+        castling_bk = copyfrom.castling_bk;
+        castling_wq = copyfrom.castling_wq;
+        castling_bq = copyfrom.castling_bq;
+        castling_wk = copyfrom.castling_wk;
+        starting_castling_wk = copyfrom.starting_castling_wk;
+        starting_castling_wq = copyfrom.starting_castling_wq;
+        starting_castling_bk = copyfrom.starting_castling_bk;
+        starting_castling_bq = copyfrom.starting_castling_bq;
+        
+        //Add move history
+        moves.AddRange(copyfrom.moves);
+    
+        //Copy turn
+        turn = copyfrom.turn;
+            
+        //Create move generator
+        moveGenerator = new MoveGenerator();   
+    }
 
     public void ResetCastlingRights()
     {
@@ -43,7 +67,7 @@ public class Board
         castling_bk = true;
         castling_bq = true;
     }
-    
+
     public void ClearBoard()
     {
         for (int i = 0; i < 64; i++) Squares[i] = Piece.None; 

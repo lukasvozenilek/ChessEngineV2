@@ -4,23 +4,23 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Minimax
+public class Minimax : Player
 {
-    private Board board;
-    private MoveGenerator moveGenerator;
-
     private int movesPruned;
     private int movesEvaluated;
     
     private const int worstEval = -10000;
     public const int bestEval = 10000;
-    public Minimax(Board board)
+
+    private int depth;
+
+    public Minimax(Board board, int depth) : base(board)
     {
-        this.board = board;
-        moveGenerator = new MoveGenerator();
+        this.depth = depth;
     }
 
-    public MoveResult? PlayNextMove()
+
+    public override MoveResult? GetMove()
     {
         movesPruned = 0;
         movesEvaluated = 0;
@@ -34,7 +34,7 @@ public class Minimax
         foreach (Move move in legalMoves.ToList())
         {
             board.MakeMove(move, false);
-            int eval = -Search(4, 3, worstEval, bestEval );
+            int eval = -Search(depth-1, depth-1, worstEval, bestEval );
             moveEvals.Add(move, eval);
             board.UnmakeMove();
         }

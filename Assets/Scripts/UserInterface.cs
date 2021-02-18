@@ -33,7 +33,7 @@ namespace DefaultNamespace
 
         public void StartNewGame()
         {
-            GameConfiguration config = new GameConfiguration(PlayerType.Human, PlayerType.AI);
+            GameConfiguration config = new GameConfiguration((PlayerType)player1dropdown.value, (PlayerType)player2dropdown.value);
             chessBoardRef.StartNewGame(config);
         }
 
