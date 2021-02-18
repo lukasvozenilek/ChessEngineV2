@@ -60,6 +60,7 @@ public class ChessBoard : MonoBehaviour
     
     private void Update()
     {
+        
         /*
         if (PlayingGame)
         {
@@ -79,7 +80,6 @@ public class ChessBoard : MonoBehaviour
             }
         }
         */
-        
         
         
         if (Input.GetButtonDown("Jump"))
@@ -103,15 +103,34 @@ public class ChessBoard : MonoBehaviour
         if (Input.GetButtonDown("White Attacking Moves"))
         {
             moveGenerator.CalculateAttacks(board, false);
-            //CreateOverlayFromSquares(moveGenerator.attackedSquares);
             CreateOverlayFromBB(moveGenerator.attackSquaresBB);
         }
         
         if (Input.GetButtonDown("Black Attacking Moves"))
         {
             moveGenerator.CalculateAttacks(board, true);
-            //CreateOverlayFromSquares(moveGenerator.attackedSquares);
             CreateOverlayFromBB(moveGenerator.attackSquaresBB);
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            moveGenerator.CalculateAttacks(board, true);
+            CreateOverlayFromBB(moveGenerator.checkSquaresBB);
+        }
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            moveGenerator.CalculateAttacks(board, false);
+            CreateOverlayFromBB(moveGenerator.checkSquaresBB);
+        }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            moveGenerator.CalculateAttacks(board, false);
+            CreateOverlayFromBB(moveGenerator.pinnedSquaresBB);
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            moveGenerator.CalculateAttacks(board, true);
+            CreateOverlayFromBB(moveGenerator.pinnedSquaresBB);
         }
         
         
@@ -209,12 +228,12 @@ public class ChessBoard : MonoBehaviour
         GO.transform.position = spawnpos;
     }
 
-    public void CreateOverlayFromBB(long bb)
+    public void CreateOverlayFromBB(ulong bb)
     {
         ClearOverlays();
         for (int i = 0; i < 64; i++)
         {
-            long mask = (long)1 << i;
+            ulong mask = (ulong)1 << i;
             if ((mask & bb) >= 1)
             {
                 CreateOverlay(i);

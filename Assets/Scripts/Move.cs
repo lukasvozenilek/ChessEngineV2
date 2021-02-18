@@ -21,12 +21,14 @@ public struct MoveResult
     public bool enpassant;
     public bool check;
     public bool castle;
-    public bool forfeitedCastling;
+    public bool pawn2squares;
+    public CastlingRights castlingRights;
 }
-
 
 public struct CastlingRights
 {
-    public bool qs;
-    public bool ks;
+    public bool w_qs;
+    public bool w_ks;
+    public bool b_qs;
+    public bool b_ks;
 }

@@ -15,6 +15,11 @@ public class Board
     public bool castling_wq;
     public bool castling_bk;
     public bool castling_bq;
+    
+    public bool starting_castling_wk;
+    public bool starting_castling_wq;
+    public bool starting_castling_bk;
+    public bool starting_castling_bq;
 
     public event Action boardUpdatedEvent;
     public event Action gameOverEvent;
@@ -89,21 +94,29 @@ public class Board
             {
                 case '-':
                     castling_bk = false;
+                    starting_castling_bk = false;
                     castling_bq = false;
+                    starting_castling_bq = false;
                     castling_wk = false;
+                    starting_castling_wk = false;
                     castling_wq = false;
+                    starting_castling_wq = false;
                     break;
                 case 'k':
                     castling_bk = true;
+                    starting_castling_bk = true;
                     break;
                 case 'K':
                     castling_wk = true;
+                    starting_castling_wk = true;
                     break;
                 case 'q':
                     castling_bq = true;
+                    starting_castling_bq = true;
                     break;
                 case 'Q':
                     castling_wq = true;
+                    starting_castling_wq = true;
                     break;
             }
         }
@@ -124,31 +137,39 @@ public class Board
     public MoveResult MakeMove(Move move, bool sendEvent = true)
     {
         MoveResult result = new MoveResult();
+        result.castlingRights = new CastlingRights();
+        
+        result.castlingRights.b_ks = castling_bk;
+        result.castlingRights.b_qs = castling_bq;
+        result.castlingRights.w_ks = castling_wk;
+        result.castlingRights.w_qs = castling_wq; 
+        
+        
         result.move = move;
         
         //Losing castling rights due to king and rook moves.
         if (castling_wq && (move.StartSquare == 0 || move.StartSquare == 4))
         {
             castling_wq = false;
-            result.forfeitedCastling = true;
+            result.castlingRights.w_qs = false;
         }
 
         if (castling_wk && (move.StartSquare == 7 || move.StartSquare == 4))
         {
             castling_wk = false;
-            result.forfeitedCastling = true;
+            result.castlingRights.w_ks = false;
         }
 
         if (castling_bq && (move.StartSquare == 56 || move.StartSquare == 60))
         {
             castling_bq = false;
-            result.forfeitedCastling = true;
+            result.castlingRights.b_qs = false;
         }
 
         if (castling_bk && (move.StartSquare == 63 || move.StartSquare == 60))
         {
             castling_bk = false;
-            result.forfeitedCastling = true;
+            result.castlingRights.b_ks = false;
         }
 
         result.capturedPiece = Squares[move.DestinationSquare];
@@ -167,6 +188,14 @@ public class Board
         Squares[move.DestinationSquare] = Squares[move.StartSquare];
         Squares[move.StartSquare] = Piece.None;
         
+        //Detect 2 move
+        if (Piece.IsType(Squares[move.DestinationSquare], Piece.Pawn) &&
+            (Mathf.Abs(move.StartSquare / 8 - move.DestinationSquare / 8) > 1))
+        {
+            result.pawn2squares = true;
+        }
+
+
         //Execute castling
         if (Piece.IsType(Squares[move.DestinationSquare], Piece.King) && (Mathf.Abs(move.StartSquare%8 - move.DestinationSquare%8) > 1) )
         {
@@ -251,9 +280,7 @@ public class Board
                     Squares[56] = Squares[59];
                     Squares[59] = Piece.None;
                 }
-                //Re-enable castling rights
-                castling_bk = true;
-                castling_bq = true;
+
             }
             else
             {
@@ -269,9 +296,6 @@ public class Board
                     Squares[0] = Squares[3];
                     Squares[3] = Piece.None;
                 }
-                //Re-enable castling rights
-                castling_wk = true;
-                castling_wq = true;
             }
             Squares[lastMove.move.DestinationSquare] = Piece.None;
         }
@@ -279,7 +303,27 @@ public class Board
         {
             Squares[lastMove.move.DestinationSquare] = lastMove.capturedPiece;
         }
-
+        
+        //Restore previous castling rights
+        if (moves.Count > 1)
+        {
+            MoveResult lastMoveResult = moves[moves.Count - 2];
+            //Black
+            castling_bk = lastMoveResult.castlingRights.b_ks;
+            castling_bq = lastMoveResult.castlingRights.b_qs;
+      
+            //White
+            castling_wk = lastMoveResult.castlingRights.w_ks;
+            castling_wq = lastMoveResult.castlingRights.w_qs;
+            
+        } else if (moves.Count == 1)
+        {
+            castling_bk = starting_castling_bk;
+            castling_wk = starting_castling_wk;
+            castling_bq = starting_castling_bq;
+            castling_wq = starting_castling_wq;
+        }
+        
         moves.RemoveAt(moves.Count-1);
         turn = !turn;
     }
