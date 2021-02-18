@@ -446,7 +446,7 @@ public class MoveGenerator
                     int pinVector_f = ((move.StartSquare % 8) - (pinnedKingSquare % 8));
                     int pinVector_mag = Math.Max(Math.Abs(pinVector_f), Math.Abs(pinVector_r));
 
-                    //Calculate if the two vectors match
+                    //Calculate if the two vectors match, both positive and negative for going both directions in pin
                     bool direction1Matches = (moveVector_r / moveVector_mag) == (pinVector_r / pinVector_mag) &&
                                            (moveVector_f / moveVector_mag) == (pinVector_f / pinVector_mag);
                     
