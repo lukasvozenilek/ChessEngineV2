@@ -2,14 +2,24 @@
 {
     public class HumanPlayer : Player
     {
-        public HumanPlayer(Board board) : base(board)
+        private ChessBoard chessBoardRef;
+        public HumanPlayer(Board board, ChessBoard chessBoardRef) : base(board)
         {
-        
+            this.chessBoardRef = chessBoardRef;
         }
 
-        public override MoveResult? PlayMove()
+        public override void PlayMove()
         {
-            return base.PlayMove();
+            if (board.turn)
+            {
+                chessBoardRef.canMoveBlackPieces = true;
+                chessBoardRef.canMoveWhitePieces = false;
+            }
+            else
+            {
+                chessBoardRef.canMoveWhitePieces = true;
+                chessBoardRef.canMoveBlackPieces = false;
+            }
         }
     }
 }

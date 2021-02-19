@@ -1,4 +1,7 @@
-﻿public enum PlayerType
+﻿using System;
+using System.Collections.Generic;
+
+public enum PlayerType
 {
     Human,
     Minimax,
@@ -10,6 +13,8 @@ public class Player
 {
     public Board board;
     public MoveGenerator moveGenerator;
+    public event Action<MoveResult?> MoveCompleteEvent;
+    public Dictionary<Move, float> moveEvaluation = new Dictionary<Move, float>();
     
     public Player (Board board)
     {
@@ -17,8 +22,13 @@ public class Player
         moveGenerator = new MoveGenerator();
     }
     
-    public virtual MoveResult? PlayMove()
+    public virtual void PlayMove()
     {
-        return null;
+        return;
+    }
+
+    public void InvokeMoveComplete(MoveResult? moveResult)
+    {
+        MoveCompleteEvent?.Invoke(moveResult);
     }
 }

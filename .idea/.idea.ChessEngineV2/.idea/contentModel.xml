@@ -14,6 +14,7 @@
           <e p="Constants.cs" t="Include" />
           <e p="Evaluation.cs" t="Include" />
           <e p="GameConfiguration.cs" t="Include" />
+          <e p="GameOverWindow.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
           <e p="Move.cs" t="Include" />
           <e p="MoveGenerator.cs" t="Include" />

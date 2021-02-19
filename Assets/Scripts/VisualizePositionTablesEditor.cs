@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(VisualizePositionTables))]
 public class VisualizePositionTablesEditor : Editor
 {
@@ -58,3 +59,4 @@ public class VisualizePositionTablesEditor : Editor
         monoRef.allObjects.Clear();
     }
 }
+#endif

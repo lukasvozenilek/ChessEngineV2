@@ -8,11 +8,11 @@ namespace Players
             
         }
 
-        public override MoveResult? PlayMove()
+        public override void PlayMove()
         {
             List<Move> moves = moveGenerator.GetAllLegalMoves(board);
-            if (moves.Count == 0) return null;
-            return board.MakeMove(moves[UnityEngine.Random.Range(0, moves.Count - 1)]);
+            if (moves.Count == 0)  InvokeMoveComplete(null);
+            InvokeMoveComplete(board.MakeMove(moves[UnityEngine.Random.Range(0, moves.Count - 1)]));
         }
     }
 }

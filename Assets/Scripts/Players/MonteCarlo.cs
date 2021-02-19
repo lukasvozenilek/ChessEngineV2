@@ -6,13 +6,15 @@ public class MonteCarlo : Player
     private Board board2;
     private int simnum=500;
     public MonteCarlo(Board board): base(board){}
-    public override MoveResult? PlayMove()
+    public override void PlayMove()
     {
         int bestscore=-99999;
         float start = Time.realtimeSinceStartup;
         List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
-        if (legalMoves.Count==0){
-            return null;
+        if (legalMoves.Count==0)
+        {
+            InvokeMoveComplete(null);
+            return;
         }
         Move bestmove = new Move();
 
@@ -38,7 +40,7 @@ public class MonteCarlo : Player
         float finish = Time.realtimeSinceStartup;
         float totaltime=finish-start;
         Debug.Log("took "+ totaltime + " seconds." );
-        return board.MakeMove(bestmove);
+        InvokeMoveComplete(board.MakeMove(bestmove));
     }
     int[] simresult()
     {   

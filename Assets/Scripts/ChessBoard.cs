@@ -24,6 +24,12 @@ public class ChessBoard : MonoBehaviour
     public AudioSource audioSource;
 
     public Board board = null;
+
+    public bool canMoveWhitePieces;
+    public bool canMoveBlackPieces;
+
+    public UserInterface userInterfaceComponent;
+
     
     void Start()
     {
@@ -31,6 +37,8 @@ public class ChessBoard : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
+        
+        
     }
     
     private void OnDestroy()
@@ -50,11 +58,13 @@ public class ChessBoard : MonoBehaviour
     {
         moveGenerator = new MoveGenerator();
         board = new Board(gameconfig.startingFEN);
+        
+        userInterfaceComponent.CloseGameResultWindow();
 
         switch (gameconfig.player1type)
         {
             case PlayerType.Human:
-                whitePlayer = new Players.HumanPlayer(board);
+                whitePlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
                 whitePlayer = new Minimax(board, 4);
@@ -70,10 +80,10 @@ public class ChessBoard : MonoBehaviour
         switch (gameconfig.player2type)
         {
             case PlayerType.Human:
-                blackPlayer = new Players.HumanPlayer(board);
+                blackPlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                blackPlayer = new Minimax(board, 5);
+                blackPlayer = new Minimax(board, 6);
                 break;
             case PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);
@@ -83,43 +93,80 @@ public class ChessBoard : MonoBehaviour
                 break;
         }
 
+        whitePlayer.MoveCompleteEvent += MoveCompletedCallback;
+        blackPlayer.MoveCompleteEvent += MoveCompletedCallback;
+
         PlayingGame = true;
-        
         UpdateBoard();
-        GameState.UpdateBoardEvent += UpdateBoard;
-        
+        whitePlayer.PlayMove();
     }
-    
-    private void Update()
+
+    //This callback may be executed from a thread, so it must be seperate and trigger an update from Unity update loop.
+    public MoveResult? PlayerMoveResult = null;
+    public bool PlayerMoveComplete = false;
+    public bool ReadyForNextMove = false;
+    public void MoveCompletedCallback(MoveResult? result)
     {
-        
-        if (PlayingGame && ((board.turn && !(blackPlayer is Players.HumanPlayer)) || (!board.turn && !(whitePlayer is Players.HumanPlayer))))
+        PlayerMoveResult = result;
+        PlayerMoveComplete = true;
+    }
+
+    public void PlayerMoveCompleted(MoveResult? result)
+    {
+        if (result == null)
         {
-            MoveResult? result;
-            if (board.turn)
-            {
-                result = blackPlayer.PlayMove();
-            }
-            else
-            {
-                result = whitePlayer.PlayMove();
-            }
-            
-            Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));
-            if (result == null)
-            {
-                Debug.Log("Checkmate!");
-                PlayingGame = false;
-            }
-            else
-            {
-                PlayAudioFromMove((MoveResult)result);
-            }
+            GameOver(board.BoardResult);
+            PlayingGame = false;
+        }
+        else
+        {
             UpdateBoard();
+            PlayAudioFromMove((MoveResult)result);
+            Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));
+            ReadyForNextMove = true;
             
         }
+    }
 
+    public void GameOver(int result)
+    {
+        ReadyForNextMove = false;
+        PlayerMoveComplete = false;
+        PlayerMoveResult = null;
+        userInterfaceComponent.GameOver(result);
+    }
 
+    private void Update()
+    {
+        if (PlayerMoveComplete)
+        {
+            PlayerMoveCompleted(PlayerMoveResult);
+            PlayerMoveComplete = false;
+        }
+
+        if (blackPlayer != null && whitePlayer != null)
+        {
+            if (blackPlayer.moveEvaluation.Count > 0)
+            {
+                userInterfaceComponent.UpdateUIEval(true,new Dictionary<Move, float>(blackPlayer.moveEvaluation));
+            } else if (whitePlayer.moveEvaluation.Count > 0)
+            {
+                userInterfaceComponent.UpdateUIEval(false, new Dictionary<Move, float>(whitePlayer.moveEvaluation));
+            } 
+        }
+
+        if (ReadyForNextMove)
+        {
+            if (!board.turn) whitePlayer.PlayMove();
+            else blackPlayer.PlayMove();
+            ReadyForNextMove = false;
+        }
+        
+        if ((canMoveWhitePieces || canMoveBlackPieces) && Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            UpdateBoard();
+        }
+        
         if (Input.GetButtonDown("Jump"))
         {
             GameState.BlackPerspective = !GameState.BlackPerspective;
@@ -174,7 +221,6 @@ public class ChessBoard : MonoBehaviour
         
     }
 
-  
 
     public void UpdateBoard()
     {
@@ -182,23 +228,26 @@ public class ChessBoard : MonoBehaviour
         ClearOverlays();
         int pos = 0;
        
-        foreach (int piece in board.Squares)
+        for (int i = 0; i < 64; i++)
         {
+            int piece = board.Squares[i];
             if (piece != Piece.None)
             {
                 GameObject GO = Instantiate(piecePrefab);
                 pieces.Add(GO);
+                
                 PieceGO pieceGO = GO.GetComponent<PieceGO>();
                 pieceGO.pieceID = piece;
+                pieceGO.myColor = board.GetPieceColor(i);
+                pieceGO.chessBoardComponent = this;
+                
                 //Calculate spawn position
                 Vector3 spawnpos = grid.CellToWorld(new Vector3Int(pos % 8, pos / 8, 0));
                 spawnpos += grid.cellSize / 2;
                 spawnpos.z = -1;
                 GO.transform.position = spawnpos;
-
                 pieceGO.startSquare = pos;
-                pieceGO.chessBoardComponent = this;
-                
+
                 //Flip piece if in black perspective
                 pieceGO.transform.localScale = GameState.BlackPerspective ? new Vector3(-1, -1, 1) : new Vector3(1, 1, 1);
                 

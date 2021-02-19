@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,9 +8,9 @@ using UnityEngine.UI;
 namespace DefaultNamespace
 {
     public class UserInterface : MonoBehaviour
-    {
+    { 
         public ChessBoard chessBoardRef;
-
+        [Header("Left Pane")]
         [Header("PERFT")] public TMP_Dropdown perftConfigDropdown;
         public Button runPERFTButton;
         public TMP_InputField perftDepthInput;
@@ -20,14 +21,20 @@ namespace DefaultNamespace
         public TMP_InputField FENInput;
         private PERFT perft;
 
+        [Header("Right pane")] 
+        [Header("Evaluation")]
+        public TMP_Text evaluationText;
 
+        [Header("References")]
+        public GameOverWindow gameOverWindowRef;
         public GameObject canvasComponent;
         public void Start()
         {
             canvasComponent.SetActive(true);
+            gameOverWindowRef.gameObject.SetActive(false);
             runPERFTButton.onClick.AddListener(RunPERFT);
             newGameButton.onClick.AddListener(StartNewGame);
-         
+            gameOverWindowRef.closeButton.onClick.AddListener(CloseGameResultWindow);
             perft = new PERFT();
         }
 
@@ -37,7 +44,43 @@ namespace DefaultNamespace
             config.startingFEN = String.IsNullOrEmpty(FENInput.text)? Constants.startingFEN : FENInput.text ;
             chessBoardRef.StartNewGame(config);
         }
+        
+        
+        public void UpdateUIEval(bool color, Dictionary<Move,float> evals)
+        {
+            string text = (color ? "Black" : "White") + " Evaluations:\n";
+            foreach (KeyValuePair<Move, float> eval in evals)
+            {
+                text += Constants.MoveToString(eval.Key) + ": " + Math.Round(eval.Value, 2) + "\n";
+            }
+            evaluationText.text = text;
+        }
 
+        public void GameOver(int result)
+        {
+            gameOverWindowRef.gameObject.SetActive(true);
+            string resultText = "Unknown Result!";
+            switch (result)
+            {
+                case Board.BOARD_DRAW:
+                    resultText = "Draw!";
+                    break;
+                case Board.BOARD_WHITEWON:
+                    resultText = "White wins!";
+                    break;
+                case Board.BOARD_BLACKWON:
+                    resultText = "Black wins!";
+                    break;
+            }
+            gameOverWindowRef.outcomeText.text = resultText;
+        }
+
+
+        public void CloseGameResultWindow()
+        {
+            gameOverWindowRef.gameObject.SetActive(false);
+        }
+        
         public void RunPERFT()
         {
             PERFTConfig config1 = new PERFTConfig();

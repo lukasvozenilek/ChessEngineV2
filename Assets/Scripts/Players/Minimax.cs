@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
+using System.Threading;
+using System.Threading.Tasks;
 
 public class Minimax : Player
 {
@@ -20,36 +21,75 @@ public class Minimax : Player
     }
 
 
-    public override MoveResult? PlayMove()
+    public override void PlayMove()
     {
+        Task.Factory.StartNew(() => RunMinimaxSearch(), TaskCreationOptions.LongRunning);
+    }
+
+    //Right now just sorts based on captures
+    private void OrderMoves (List<Move> moves)
+    {
+        int[] moveScores = new int[moves.Count];
+        for (int i = 0; i < moves.Count; i++) {
+            int score = 0;
+            int movePieceType = Piece.GetType(board.Squares[moves[i].StartSquare]);
+            int capturePieceType = Piece.GetType(board.Squares[moves[i].DestinationSquare]);
+            if (capturePieceType != Piece.None)
+            {
+                score = 10;
+            }
+            else
+            {
+                score = 0;
+            }
+            moveScores[i] = score;
+        }
+        Sort (moves, moveScores);
+    }
+    
+    
+    private void Sort (List<Move> moves, int[] moveScores) {
+        for (int i = 0; i < moves.Count - 1; i++) {
+            for (int j = i + 1; j > 0; j--) {
+                int swapIndex = j - 1;
+                if (moveScores[swapIndex] < moveScores[j]) {
+                    (moves[j], moves[swapIndex]) = (moves[swapIndex], moves[j]);
+                    (moveScores[j], moveScores[swapIndex]) = (moveScores[swapIndex], moveScores[j]);
+                }
+            }
+        }
+    }
+
+
+    private void RunMinimaxSearch()
+    {
+        Debug.Log("Starting Threaded Minimax Search!");
+        moveEvaluation.Clear();
         movesPruned = 0;
         movesEvaluated = 0;
         List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
         if (legalMoves.Count == 0)
         {
-            return null;
+            Debug.Log("No legal moves found");
+            InvokeMoveComplete(null);
+            return;
         }
 
-        Dictionary<Move, float> moveEvals = new Dictionary<Move, float>();
+        OrderMoves(legalMoves);
         foreach (Move move in legalMoves.ToList())
         {
             board.MakeMove(move, false);
             float eval = -Search(depth-1, depth-1, worstEval, bestEval );
-            moveEvals.Add(move, eval);
+            moveEvaluation.Add(move, eval);
             board.UnmakeMove();
         }
 
-        foreach (KeyValuePair<Move, float> moveResult in moveEvals)
-        {
-            Debug.Log("Move " + Constants.MoveToString(moveResult.Key) + " had eval of " + moveResult.Value);
-        }
-        
         Debug.Log("Total moves evaluated: " + movesEvaluated);
         Debug.Log("Total moves pruned: " + movesPruned);
         
-        Move bestMove = moveEvals.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
-
-        return board.MakeMove(bestMove);
+        Move bestMove = moveEvaluation.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+        
+        InvokeMoveComplete(board.MakeMove(bestMove));
     }
 
     private float Search(int depthlept, int startdepth, float alpha, float beta)
@@ -74,6 +114,7 @@ public class Minimax : Player
         }
 
         int i = 0;
+        OrderMoves(legalMoves);
         foreach (Move move in legalMoves.ToList())
         {
             i++;
