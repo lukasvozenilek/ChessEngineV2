@@ -1,63 +1,62 @@
 using UnityEngine;
-/*
-public class MonteCarlo
+using System.Collections.Generic;
+using System.Linq;
+public class MonteCarlo : Player
 {
-    private Board board;
     private Board board2;
-    private MoveGenerator moveGenerator;
-    public Move moveselect(Board board)
+    private int simnum=100;
+    public MonteCarlo(Board board): base(board){}
+    public override MoveResult? PlayMove()
     {
         int bestscore=-99999;
-        int start = Time.realTimesincestart;
-        
+        float start = Time.realtimeSinceStartup;
+        List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
+        if (legalMoves.Count==0){
+            return null;
+        }
+        Move bestmove = new Move();
+
         foreach (Move move in legalMoves.ToList())
         {   
-            board2=new Board();
-            board2.Squares = board.Squares;
-            board2.MakeMove(move, false);
-            simresult = simresult(board);
-            int score = simresult[0]-simresult[1];
+            board.MakeMove(move, false);
+            int[] result = simresult();
+            int score = result[0]-result[1];
             
-            print(simresult,move,score);
+            Debug.Log(result[0]+result[1]+result[2]+Constants.MoveToString(move)+score);
             
             if (score>bestscore){
-                Move bestmove=move;
+                bestmove=move;
                 bestscore=score;
             }
             
             board.UnmakeMove();
             
-            if (bestscore==100){
-                break;
-            }
+            // if (bestscore==simnum){
+            //     break;
+            // }
         }
-        int finish = Time.realTimesincestart;
-        totaltime=finish-start;
+        float finish = Time.realtimeSinceStartup;
+        float totaltime=finish-start;
         Debug.Log("took "+ totaltime + " seconds." );
-        return bestmove;
+        return board.MakeMove(bestmove);
     }
-    void simresult()
+    int[] simresult()
     {   
-        fen = board.fen();
         int win=0;
         int loss=0;
         int draw = 0;
         int cores = SystemInfo.processorCount;
-        int simnum= 100;
-        string[] values;
-        string[] results;
-        
-        find way to make array of fens
+        List <string> outcomes= new List<string>();
+        for(int i=0; i< simnum; i++)
+            board2=new Board(board);
+            outcomes.Add(worker());
 
-        foreach (string value in values)
-            results.append(worker());
-
-        foreach (string result in results)
+        foreach (string outcome in outcomes)
         {
-            if (result == "1-0"){
+            if (outcome == "1-0"){
                 win++;
             }
-            else if(result=="0-1"){
+            else if(outcome=="0-1"){
                 loss++;
             }
             else
@@ -69,25 +68,20 @@ public class MonteCarlo
         return result;
 
     }
-    void worker()
+    string worker()
     {
-        
-        board2.setfen(fen);
         while (true)
         {
-            moves=board2.legalMoves;
-            if (moves.Length==0){
+            List<Move> moves = moveGenerator.GetAllLegalMoves(board2);
+            if (moves.Count==0 || board2.moves.Count>170){
                 break;
             }
-            Random rand = new Random();
-            int index = rand.Next(moves.Length);
-            board2.MakeMove(moves[index]);            
+            board2.MakeMove(moves[Random.Range(0, moves.Count-1)]);                
         }
-        string result = board2.result();
-        return(result);
+        string ramification = "1-0";
+        return ramification;
 
 
 
     }
 }
-*/

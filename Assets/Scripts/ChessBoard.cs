@@ -60,6 +60,7 @@ public class ChessBoard : MonoBehaviour
                 whitePlayer = new Minimax(board, 4);
                 break;
             case PlayerType.MonteCarlo:
+                whitePlayer = new MonteCarlo(board);
                 break;
             case PlayerType.Random:
                 whitePlayer = new Players.Random(board);
@@ -75,7 +76,8 @@ public class ChessBoard : MonoBehaviour
                 blackPlayer = new Minimax(board, 4);
                 break;
             case PlayerType.MonteCarlo:
-                break;
+                 whitePlayer = new MonteCarlo(board);
+                 break;
             case PlayerType.Random:
                 blackPlayer = new Players.Random(board);
                 break;
