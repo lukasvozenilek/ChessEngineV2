@@ -45,10 +45,9 @@ namespace DefaultNamespace
             chessBoardRef.StartNewGame(config);
         }
         
-        
         public void UpdateUIEval(bool color, Dictionary<Move,float> evals)
         {
-            string text = (color ? "Black" : "White") + " Evaluations:\n";
+            string text = (color ? "Black" : "White") + ":\n";
             foreach (KeyValuePair<Move, float> eval in evals)
             {
                 text += Constants.MoveToString(eval.Key) + ": " + Math.Round(eval.Value, 2) + "\n";

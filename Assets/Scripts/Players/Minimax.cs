@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 public class Minimax : Player
 {
-    private int movesPruned;
+    private int alphaPrunes;
+    private int betaPrunes;
     private int movesEvaluated;
     
     private const float worstEval = -10000;
@@ -65,7 +66,8 @@ public class Minimax : Player
     {
         Debug.Log("Starting Threaded Minimax Search!");
         moveEvaluation.Clear();
-        movesPruned = 0;
+        alphaPrunes = 0;
+        betaPrunes = 0;
         movesEvaluated = 0;
         List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
         if (legalMoves.Count == 0)
@@ -85,8 +87,8 @@ public class Minimax : Player
         }
 
         Debug.Log("Total moves evaluated: " + movesEvaluated);
-        Debug.Log("Total moves pruned: " + movesPruned);
-        
+        Debug.Log("Alpha prunes: " + alphaPrunes);
+        Debug.Log("Beta prunes: " + betaPrunes);
         Move bestMove = moveEvaluation.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         
         InvokeMoveComplete(board.MakeMove(bestMove));
@@ -123,21 +125,21 @@ public class Minimax : Player
             board.UnmakeMove();
             if (startdepth - depthlept % 2 == 0)
             {
-                if (result <= alpha)
+                beta = Math.Min(beta, result);
+                if (beta <= alpha)
                 {
-                    movesPruned += totalMoves - i;
+                    alphaPrunes += totalMoves - i;
                     return alpha;
                 }
-                beta = Math.Min(beta, result);
             }
             else
             {
-                if (result >= beta)
+                alpha = Math.Max(alpha, result);
+                if (alpha >= beta)
                 {
-                    movesPruned += totalMoves - i;
+                    betaPrunes += totalMoves - i;
                     return beta;
                 }
-                alpha = Math.Max(alpha, result);
             }
         }
         return alpha;

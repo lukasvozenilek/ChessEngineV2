@@ -10,6 +10,11 @@
 
         public override void PlayMove()
         {
+            if (moveGenerator.GetAllLegalMoves(board).Count == 0)
+            {
+                InvokeMoveComplete(null);
+            }
+            
             if (board.turn)
             {
                 chessBoardRef.canMoveBlackPieces = true;
