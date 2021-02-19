@@ -9,8 +9,8 @@ public class Minimax : Player
     private int movesPruned;
     private int movesEvaluated;
     
-    private const int worstEval = -10000;
-    public const int bestEval = 10000;
+    private const float worstEval = -10000;
+    public const float bestEval = 10000;
 
     private int depth;
 
@@ -20,7 +20,7 @@ public class Minimax : Player
     }
 
 
-    public override MoveResult? GetMove()
+    public override MoveResult? PlayMove()
     {
         movesPruned = 0;
         movesEvaluated = 0;
@@ -30,16 +30,16 @@ public class Minimax : Player
             return null;
         }
 
-        Dictionary<Move, int> moveEvals = new Dictionary<Move, int>();
+        Dictionary<Move, float> moveEvals = new Dictionary<Move, float>();
         foreach (Move move in legalMoves.ToList())
         {
             board.MakeMove(move, false);
-            int eval = -Search(depth-1, depth-1, worstEval, bestEval );
+            float eval = -Search(depth-1, depth-1, worstEval, bestEval );
             moveEvals.Add(move, eval);
             board.UnmakeMove();
         }
 
-        foreach (KeyValuePair<Move, int> moveResult in moveEvals)
+        foreach (KeyValuePair<Move, float> moveResult in moveEvals)
         {
             Debug.Log("Move " + Constants.MoveToString(moveResult.Key) + " had eval of " + moveResult.Value);
         }
@@ -52,7 +52,7 @@ public class Minimax : Player
         return board.MakeMove(bestMove);
     }
 
-    private int Search(int depthlept, int startdepth, int alpha, int beta)
+    private float Search(int depthlept, int startdepth, float alpha, float beta)
     {
         if (depthlept == 0)
         {
@@ -78,7 +78,7 @@ public class Minimax : Player
         {
             i++;
             board.MakeMove(move, false);
-            int result = -Search(depthlept - 1, startdepth, -beta, -alpha);
+            float result = -Search(depthlept - 1, startdepth, -beta, -alpha);
             board.UnmakeMove();
             if (startdepth - depthlept % 2 == 0)
             {

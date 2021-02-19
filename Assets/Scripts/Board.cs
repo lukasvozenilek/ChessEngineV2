@@ -9,6 +9,9 @@ public class Board
     public bool turn;
     public List<MoveResult> moves = new List<MoveResult>();
     
+    public int fullmoves;
+    public int halfMoveClock;
+    
     //Castling rights
     public bool castling_wk;
     public bool castling_wq;
@@ -28,15 +31,18 @@ public class Board
 
     private MoveGenerator moveGenerator;
     
+    //New board from FEN
     public Board(string FEN = Constants.startingFEN)
     {
         Squares = new int[64];
         LoadPositionFromFEN(FEN);
-        moveGenerator = new MoveGenerator();
+        InitBoard();
     }
-    
+    //New board from another board
     public Board(Board copyfrom)
     {
+        Squares = new int[64];
+        
         //Copy current position
         Squares = copyfrom.Squares;
         
@@ -55,9 +61,13 @@ public class Board
     
         //Copy turn
         turn = copyfrom.turn;
-            
-        //Create move generator
-        moveGenerator = new MoveGenerator();   
+        InitBoard();
+    }
+
+    private void InitBoard()
+    {
+        moveGenerator = new MoveGenerator();
+        GeneratePieceLists();
     }
 
     public void ResetCastlingRights()
@@ -66,6 +76,18 @@ public class Board
         castling_wq = true;
         castling_bk = true;
         castling_bq = true;
+    }
+
+    public void GeneratePieceLists()
+    {
+        for (int i = 0; i < 64; i++)
+        {
+            if (!Piece.IsType(Squares[i], Piece.None))
+            {
+                if (GetPieceColor(i)) blackPieces.Add(i);
+                else whitePieces.Add(i);
+            }
+        }
     }
 
     public void ClearBoard()
@@ -168,7 +190,6 @@ public class Board
         result.castlingRights.w_ks = castling_wk;
         result.castlingRights.w_qs = castling_wq; 
         
-        
         result.move = move;
         
         //Losing castling rights due to king and rook moves.
@@ -263,9 +284,11 @@ public class Board
             Squares[move.DestinationSquare] = move.promotionID + (turn? Piece.Black : Piece.White);
         }
         
+        
         //Finally, add move to records and update turn.
         moves.Add(result);
         turn = !turn;
+        result.legal = true;
         return result;
     }
 
@@ -356,7 +379,7 @@ public class Board
     {
         MoveResult result = new MoveResult();
         result.move = move;
-        if (GetPieceColor(move.StartSquare) == turn && moveGenerator.GetAllLegalMoves(this).Contains(move))
+        if (moveGenerator.GetAllLegalMoves(this).Contains(move))
         {
             result = MakeMove(move);
             result.legal = true;

@@ -15,15 +15,23 @@
           <e p="Evaluation.cs" t="Include" />
           <e p="GameConfiguration.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
-          <e p="HumanPlayer.cs" t="Include" />
-          <e p="Minimax.cs" t="Include" />
           <e p="Move.cs" t="Include" />
           <e p="MoveGenerator.cs" t="Include" />
+          <e p="Overlay.cs" t="Include" />
           <e p="PERFT.cs" t="Include" />
           <e p="Piece.cs" t="Include" />
           <e p="PieceGO.cs" t="Include" />
-          <e p="Player.cs" t="Include" />
+          <e p="Players" t="Include">
+            <e p="HumanPlayer.cs" t="Include" />
+            <e p="Minimax.cs" t="Include" />
+            <e p="MonteCarlo.cs" t="Include" />
+            <e p="Player.cs" t="Include" />
+            <e p="Random.cs" t="Include" />
+          </e>
+          <e p="PositionWeightTable.cs" t="Include" />
           <e p="UserInterface.cs" t="Include" />
+          <e p="VisualizePositionTables.cs" t="Include" />
+          <e p="VisualizePositionTablesEditor.cs" t="Include" />
         </e>
         <e p="TextMesh Pro" t="Include">
           <e p="Fonts" t="Include">

@@ -30,5 +30,14 @@ namespace DefaultNamespace
         public Sprite blackKnight;
         public Sprite blackPawn;
         public Sprite blackRook;
+
+
+        [Header("Position Tables")] 
+        public PositionWeightTable pawnTable;
+        public PositionWeightTable rookTable;
+        public PositionWeightTable kingTable;
+        public PositionWeightTable queenTable;
+        public PositionWeightTable knightTable;
+        public PositionWeightTable bishopTable;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,34 +14,27 @@ namespace DefaultNamespace
         public Button runPERFTButton;
         public TMP_InputField perftDepthInput;
 
-        [Header("Test Game")] public Button testGameButton;
-        public TMP_InputField FENInput;
-
         [Header("New Game")] public Button newGameButton;
         public TMP_Dropdown player1dropdown;
         public TMP_Dropdown player2dropdown;
-
+        public TMP_InputField FENInput;
         private PERFT perft;
 
+
+        public GameObject canvasComponent;
         public void Start()
         {
+            canvasComponent.SetActive(true);
             runPERFTButton.onClick.AddListener(RunPERFT);
             newGameButton.onClick.AddListener(StartNewGame);
-            testGameButton.onClick.AddListener(StartTestGame);
-            
+         
             perft = new PERFT();
         }
 
         public void StartNewGame()
         {
             GameConfiguration config = new GameConfiguration((PlayerType)player1dropdown.value, (PlayerType)player2dropdown.value);
-            chessBoardRef.StartNewGame(config);
-        }
-
-        public void StartTestGame()
-        {
-            GameConfiguration config = new GameConfiguration(PlayerType.Human, PlayerType.Human,
-                "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+            config.startingFEN = String.IsNullOrEmpty(FENInput.text)? Constants.startingFEN : FENInput.text ;
             chessBoardRef.StartNewGame(config);
         }
 

@@ -54,24 +54,30 @@ public class ChessBoard : MonoBehaviour
         switch (gameconfig.player1type)
         {
             case PlayerType.Human:
-                whitePlayer = new HumanPlayer(board);
+                whitePlayer = new Players.HumanPlayer(board);
                 break;
             case PlayerType.Minimax:
                 whitePlayer = new Minimax(board, 4);
                 break;
             case PlayerType.MonteCarlo:
                 break;
+            case PlayerType.Random:
+                whitePlayer = new Players.Random(board);
+                break;
         }
         
         switch (gameconfig.player2type)
         {
             case PlayerType.Human:
-                blackPlayer = new HumanPlayer(board);
+                blackPlayer = new Players.HumanPlayer(board);
                 break;
             case PlayerType.Minimax:
                 blackPlayer = new Minimax(board, 4);
                 break;
             case PlayerType.MonteCarlo:
+                break;
+            case PlayerType.Random:
+                blackPlayer = new Players.Random(board);
                 break;
         }
 
@@ -83,16 +89,16 @@ public class ChessBoard : MonoBehaviour
     
     private void Update()
     {
-        if (PlayingGame && ((board.turn && !(blackPlayer is HumanPlayer)) || (!board.turn && !(whitePlayer is HumanPlayer))))
+        if (PlayingGame && ((board.turn && !(blackPlayer is Players.HumanPlayer)) || (!board.turn && !(whitePlayer is Players.HumanPlayer))))
         {
             MoveResult? result;
             if (board.turn)
             {
-                result = blackPlayer.GetMove();
+                result = blackPlayer.PlayMove();
             }
             else
             {
-                result = whitePlayer.GetMove();
+                result = whitePlayer.PlayMove();
             }
             
             Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));

@@ -1,5 +1,5 @@
 using UnityEngine;
-using Random;
+/*
 public class MonteCarlo
 {
     private Board board;
@@ -46,9 +46,9 @@ public class MonteCarlo
         int simnum= 100;
         string[] values;
         string[] results;
-        /* 
+        
         find way to make array of fens
-        */
+
         foreach (string value in values)
             results.append(worker());
 
@@ -90,3 +90,4 @@ public class MonteCarlo
 
     }
 }
+*/

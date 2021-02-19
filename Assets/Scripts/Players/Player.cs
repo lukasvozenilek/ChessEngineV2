@@ -3,6 +3,7 @@
     Human,
     Minimax,
     MonteCarlo,
+    Random
 }
 
 public class Player
@@ -16,7 +17,7 @@ public class Player
         moveGenerator = new MoveGenerator();
     }
     
-    public virtual MoveResult? GetMove()
+    public virtual MoveResult? PlayMove()
     {
         return null;
     }

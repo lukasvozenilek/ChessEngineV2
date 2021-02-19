@@ -42,3 +42,9 @@ MonoBehaviour:
     type: 3}
   blackRook: {fileID: -8043906449996607461, guid: 754c671d9921e774bbaab0f8cd1b0a57,
     type: 3}
+  pawnTable: {fileID: 11400000, guid: ddc4e7ccd6f3e3b499750ae46e22ef08, type: 2}
+  rookTable: {fileID: 11400000, guid: af75133365faf4f4e9a44ab2d59c6ecf, type: 2}
+  kingTable: {fileID: 11400000, guid: 150e49d9a62d77d4d81f3b7c94f9cb7e, type: 2}
+  queenTable: {fileID: 11400000, guid: 8071b4571df101842aaaa3dbe6110983, type: 2}
+  knightTable: {fileID: 11400000, guid: f1d85c8cc40fa9345986f2d4e7d7bcf7, type: 2}
+  bishopTable: {fileID: 11400000, guid: d428ebbf89fae0a4b8bfa13b13160026, type: 2}
