@@ -349,8 +349,9 @@ public class MoveGenerator
                             //Black castling
                             if (myColor && (board.castling_bk || board.castling_bq))
                             {
-                                if (board.castling_bk)
+                                if (board.castling_bk && square < 61)
                                 {
+                                    
                                     if (((Constants.posToBBArray[square + 1] & attackSquaresBB) == 0) &&
                                     ((Constants.posToBBArray[square + 2] & attackSquaresBB) == 0))
                                     {
@@ -363,7 +364,7 @@ public class MoveGenerator
                                     }
                                 }
 
-                                if (board.castling_bq)
+                                if (board.castling_bq && square > 4)
                                 {
                                     if (((Constants.posToBBArray[square - 1] & attackSquaresBB) == 0) &&
                                         ((Constants.posToBBArray[square - 2] & attackSquaresBB) == 0))
@@ -382,7 +383,7 @@ public class MoveGenerator
                             //White Castling
                             else if (!myColor && (board.castling_wk || board.castling_wq))
                             {
-                                if (board.castling_wk)
+                                if (board.castling_wk && square < 61)
                                 {
                                     if (((Constants.posToBBArray[square + 1] & attackSquaresBB) == 0) &&
                                         ((Constants.posToBBArray[square + 2] & attackSquaresBB) == 0))
@@ -396,7 +397,7 @@ public class MoveGenerator
                                     }
                                 }
 
-                                if (board.castling_wq)
+                                if (board.castling_wq && square > 3)
                                 {
                                     if (((Constants.posToBBArray[square - 1] & attackSquaresBB) == 0) &&
                                         ((Constants.posToBBArray[square - 2] & attackSquaresBB) == 0))
@@ -481,6 +482,20 @@ public class MoveGenerator
                 }
             }
             legalMoves = filteredMoves.ToList();
+        }
+
+        if (legalMoves.Count == 0)
+        {
+            if (checkSquaresBB > 0)
+            {
+                //We are checkmated
+                board.BoardResult = board.turn ? Board.BOARD_WHITEWON : Board.BOARD_BLACKWON;
+            }
+            else
+            {
+                //Stalemate
+                board.BoardResult = Board.BOARD_DRAW;
+            }
         }
 
         return legalMoves;

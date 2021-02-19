@@ -30,6 +30,15 @@ public class Board
     public List<int> blackPieces = new List<int>();
 
     private MoveGenerator moveGenerator;
+
+
+    public int BoardResult = BOARD_PROGR;
+    
+    public const int BOARD_PROGR = 0;
+    public const int BOARD_WHITEWON = 1;
+    public const int BOARD_BLACKWON = 2;
+    public const int BOARD_DRAW = 3;
+    
     
     //New board from FEN
     public Board(string FEN = Constants.startingFEN)
@@ -44,8 +53,8 @@ public class Board
         Squares = new int[64];
         
         //Copy current position
-        Squares = copyfrom.Squares;
-        
+        Array.Copy(copyfrom.Squares, 0, Squares, 0, 64);
+
         //Copy current and starting castling rights
         castling_bk = copyfrom.castling_bk;
         castling_wq = copyfrom.castling_wq;
@@ -66,6 +75,7 @@ public class Board
 
     private void InitBoard()
     {
+        BoardResult = BOARD_PROGR;
         moveGenerator = new MoveGenerator();
         GeneratePieceLists();
     }

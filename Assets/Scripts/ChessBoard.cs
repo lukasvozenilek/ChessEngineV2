@@ -73,7 +73,7 @@ public class ChessBoard : MonoBehaviour
                 blackPlayer = new Players.HumanPlayer(board);
                 break;
             case PlayerType.Minimax:
-                blackPlayer = new Minimax(board, 4);
+                blackPlayer = new Minimax(board, 5);
                 break;
             case PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);
@@ -87,10 +87,12 @@ public class ChessBoard : MonoBehaviour
         
         UpdateBoard();
         GameState.UpdateBoardEvent += UpdateBoard;
+        
     }
     
     private void Update()
     {
+        
         if (PlayingGame && ((board.turn && !(blackPlayer is Players.HumanPlayer)) || (!board.turn && !(whitePlayer is Players.HumanPlayer))))
         {
             MoveResult? result;
@@ -116,8 +118,8 @@ public class ChessBoard : MonoBehaviour
             UpdateBoard();
             
         }
-        
-        
+
+
         if (Input.GetButtonDown("Jump"))
         {
             GameState.BlackPerspective = !GameState.BlackPerspective;

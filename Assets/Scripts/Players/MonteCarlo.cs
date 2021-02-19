@@ -4,7 +4,7 @@ using System.Linq;
 public class MonteCarlo : Player
 {
     private Board board2;
-    private int simnum=100;
+    private int simnum=500;
     public MonteCarlo(Board board): base(board){}
     public override MoveResult? PlayMove()
     {
@@ -22,7 +22,7 @@ public class MonteCarlo : Player
             int[] result = simresult();
             int score = result[0]-result[1];
             
-            Debug.Log(result[0]+result[1]+result[2]+Constants.MoveToString(move)+score);
+            Debug.Log("Move " + Constants.MoveToString(move) + " had eval of " + score + " with " + result[0] + "-" + result[1]);
             
             if (score>bestscore){
                 bestmove=move;
@@ -46,17 +46,19 @@ public class MonteCarlo : Player
         int loss=0;
         int draw = 0;
         int cores = SystemInfo.processorCount;
-        List <string> outcomes= new List<string>();
-        for(int i=0; i< simnum; i++)
-            board2=new Board(board);
-            outcomes.Add(worker());
-
-        foreach (string outcome in outcomes)
+        List <int> outcomes= new List<int>();
+        for (int i = 0; i < simnum; i++)
         {
-            if (outcome == "1-0"){
+            board2 = new Board(board);
+            outcomes.Add(worker());
+        }
+
+        foreach (int outcome in outcomes)
+        {
+            if (outcome == Board.BOARD_WHITEWON){
                 win++;
             }
-            else if(outcome=="0-1"){
+            else if(outcome==Board.BOARD_BLACKWON){
                 loss++;
             }
             else
@@ -68,18 +70,22 @@ public class MonteCarlo : Player
         return result;
 
     }
-    string worker()
+    int worker()
     {
         while (true)
         {
             List<Move> moves = moveGenerator.GetAllLegalMoves(board2);
-            if (moves.Count==0 || board2.moves.Count>170){
+            if (moves.Count == 0){
                 break;
             }
-            board2.MakeMove(moves[Random.Range(0, moves.Count-1)]);                
+            if (board2.moves.Count > 150)
+            {
+                board2.BoardResult = Board.BOARD_DRAW;
+                break;
+            }
+            board2.MakeMove(moves[Random.Range(0, moves.Count-1)], false);                
         }
-        string ramification = "1-0";
-        return ramification;
+        return board2.BoardResult;
 
 
 
