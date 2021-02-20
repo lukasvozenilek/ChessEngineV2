@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// ChessBoard.cs is the monobehaviour responsible for the graphical representation of the board
@@ -37,8 +39,6 @@ public class ChessBoard : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         whiteSquares.color = boardConfig.whiteColor;
         blackSquares.color = boardConfig.blackColor;
-        
-        
     }
     
     private void OnDestroy()
@@ -75,6 +75,9 @@ public class ChessBoard : MonoBehaviour
             case PlayerType.Random:
                 whitePlayer = new Players.Random(board);
                 break;
+            case PlayerType.Stockfish:
+                whitePlayer = new Players.Stockfish(board);
+                break;
         }
         
         switch (gameconfig.player2type)
@@ -91,6 +94,10 @@ public class ChessBoard : MonoBehaviour
             case PlayerType.Random:
                 blackPlayer = new Players.Random(board);
                 break;
+            case PlayerType.Stockfish:
+                blackPlayer = new Players.Stockfish(board);
+                break;
+            
         }
 
         whitePlayer.MoveCompleteEvent += MoveCompletedCallback;
@@ -140,8 +147,8 @@ public class ChessBoard : MonoBehaviour
     {
         if (PlayerMoveComplete)
         {
-            PlayerMoveCompleted(PlayerMoveResult);
             PlayerMoveComplete = false;
+            PlayerMoveCompleted(PlayerMoveResult);
         }
 
         if (blackPlayer != null && whitePlayer != null)

@@ -9,7 +9,6 @@ public class Board
     public bool turn;
     public List<MoveResult> moves = new List<MoveResult>();
     
-    public int fullmoves;
     public int halfMoveClock;
     
     //Castling rights
@@ -188,6 +187,99 @@ public class Board
         
         GameState.UpdateBoard();
     }
+    
+    public string GenerateFEN () {
+			string fen = "";
+			for (int rank = 7; rank >= 0; rank--) {
+				int numEmptyFiles = 0;
+				for (int file = 0; file < 8; file++) {
+					int i = rank * 8 + file;
+					int piece = Squares[i];
+					if (piece != 0) {
+						if (numEmptyFiles != 0) {
+							fen += numEmptyFiles;
+							numEmptyFiles = 0;
+						}
+						bool isBlack = GetPieceColor(i);
+						int pieceType = Piece.GetType(piece);
+						char pieceChar = ' ';
+						switch (pieceType) {
+							case Piece.Rook:
+								pieceChar = 'R';
+								break;
+							case Piece.Knight:
+								pieceChar = 'N';
+								break;
+							case Piece.Bishop:
+								pieceChar = 'B';
+								break;
+							case Piece.Queen:
+								pieceChar = 'Q';
+								break;
+							case Piece.King:
+								pieceChar = 'K';
+								break;
+							case Piece.Pawn:
+								pieceChar = 'P';
+								break;
+						}
+						fen += (isBlack) ? pieceChar.ToString ().ToLower () : pieceChar.ToString ();
+					} else {
+						numEmptyFiles++;
+					}
+
+				}
+				if (numEmptyFiles != 0) {
+					fen += numEmptyFiles;
+				}
+				if (rank != 0) {
+					fen += '/';
+				}
+			}
+
+			// Side to move
+			fen += ' ';
+			fen += (!turn) ? 'w' : 'b';
+
+			// Castling
+            bool whiteKingside = castling_wk;
+            bool whiteQueenside = castling_wq;
+            bool blackKingside = castling_bk;
+            bool blackQueenside = castling_bq;
+			fen += ' ';
+			fen += (whiteKingside) ? "K" : "";
+			fen += (whiteQueenside) ? "Q" : "";
+			fen += (blackKingside) ? "k" : "";
+			fen += (blackQueenside) ? "q" : "";
+
+            fen += "-";
+			//fen += ((Board.currentGameState & 15) == 0) ? "-" : "";
+            fen += "-";
+            fen += ' ';
+			// En-passant
+            fen += '-';
+            /*
+			fen += ' ';
+			int epFile = (int) (board.currentGameState >> 4) & 15;
+			if (epFile == 0) {
+				fen += '-';
+			} else {
+				string fileName = BoardRepresentation.fileNames[epFile - 1].ToString ();
+				int epRank = (board.WhiteToMove) ? 6 : 3;
+				fen += fileName + epRank;
+			}
+			*/
+
+			// 50 move counter
+			fen += ' ';
+			fen += halfMoveClock;
+
+			// Full-move count (should be one at start, and increase after each move by black)
+			fen += ' ';
+			fen += (moves.Count / 2) + 1;
+
+			return fen;
+		}
     
 
     public MoveResult MakeMove(Move move, bool sendEvent = true)

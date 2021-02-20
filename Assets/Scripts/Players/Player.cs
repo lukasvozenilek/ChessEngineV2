@@ -6,7 +6,8 @@ public enum PlayerType
     Human,
     Minimax,
     MonteCarlo,
-    Random
+    Random,
+    Stockfish
 }
 
 public class Player

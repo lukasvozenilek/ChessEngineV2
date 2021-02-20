@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class Constants
@@ -94,4 +95,43 @@ public static class Constants
         return ConvertToCoord(move.StartSquare) + ConvertToCoord(move.DestinationSquare);
     }
     
+    public static Move StringToMove(string moveString)
+    {
+        Move move = new Move();
+        
+        int file = FileToNum(moveString[0]);
+        int rank = int.Parse(moveString[1].ToString()) - 1;
+        move.StartSquare = (rank * 8) + file;
+        
+        file = FileToNum(moveString[2]);
+        rank = int.Parse(moveString[3].ToString()) - 1;
+        move.DestinationSquare = (rank * 8) + file;
+        
+        return move;
+    }
+    
+    public static int FileToNum(char file)
+    {
+        switch (Char.ToLower(file))
+        {
+            case 'a':
+                return 0;
+            case 'b':
+                return 1;
+            case 'c':
+                return 2;
+            case 'd':
+                return 3;
+            case 'e':
+                return 4;
+            case 'f':
+                return 5;
+            case 'g':
+                return 6;
+            case 'h':
+                return 7;
+            default:
+                return -1;
+        }
+    }
 }

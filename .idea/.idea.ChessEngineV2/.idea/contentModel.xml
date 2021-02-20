@@ -28,6 +28,7 @@
             <e p="MonteCarlo.cs" t="Include" />
             <e p="Player.cs" t="Include" />
             <e p="Random.cs" t="Include" />
+            <e p="Stockfish.cs" t="Include" />
           </e>
           <e p="PositionWeightTable.cs" t="Include" />
           <e p="UserInterface.cs" t="Include" />
