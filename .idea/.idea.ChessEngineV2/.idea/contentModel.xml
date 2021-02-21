@@ -12,7 +12,7 @@
           <e p="CameraController.cs" t="Include" />
           <e p="ChessBoard.cs" t="Include" />
           <e p="Constants.cs" t="Include" />
-          <e p="Evaluation.cs" t="Include" />
+          <e p="Evaluator.cs" t="Include" />
           <e p="GameConfiguration.cs" t="Include" />
           <e p="GameOverWindow.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
@@ -31,6 +31,7 @@
             <e p="Stockfish.cs" t="Include" />
           </e>
           <e p="PositionWeightTable.cs" t="Include" />
+          <e p="SpeedTest.cs" t="Include" />
           <e p="UserInterface.cs" t="Include" />
           <e p="VisualizePositionTables.cs" t="Include" />
           <e p="VisualizePositionTablesEditor.cs" t="Include" />

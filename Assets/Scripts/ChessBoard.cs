@@ -67,7 +67,7 @@ public class ChessBoard : MonoBehaviour
                 whitePlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                whitePlayer = new Minimax(board, 4);
+                whitePlayer = new Minimax(board, 5);
                 break;
             case PlayerType.MonteCarlo:
                 whitePlayer = new MonteCarlo(board);
@@ -86,7 +86,7 @@ public class ChessBoard : MonoBehaviour
                 blackPlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                blackPlayer = new Minimax(board, 6);
+                blackPlayer = new Minimax(board, 5);
                 break;
             case PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);
@@ -129,7 +129,7 @@ public class ChessBoard : MonoBehaviour
         {
             UpdateBoard();
             PlayAudioFromMove((MoveResult)result);
-            Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));
+            //Debug.Log("Current Evaluation: " + Evaluation.EvaluateBoard(board));
             ReadyForNextMove = true;
             
         }
@@ -174,11 +174,17 @@ public class ChessBoard : MonoBehaviour
             UpdateBoard();
         }
         
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             GameState.BlackPerspective = !GameState.BlackPerspective;
             UpdateBoard();
         }
+        
+        if (Input.GetKey(KeyCode.Space))
+        {
+            UpdateBoard();
+        }
+        
         if (Input.GetButtonDown("Undo Move"))
         {
             board.UnmakeMove();

@@ -8,6 +8,29 @@ public static class Constants
     public const ulong BB_ALL = 0xffffffffffffffff;
     public const ulong BB_NONE = 0;
     
+    
+    public const int QueenValue = 8;
+    public const int PawnValue = 1;
+    public const int KnightValue = 3;
+    public const int BishopValue = 3;
+    public const int RookValue = 5;
+
+
+    public static float[] kingTable;
+    public static float[] kingTable_endgame;
+    public static float[] pawnTable;
+    public static float[] bishopTable;
+    public static float[] knightTable;
+    public static float[] queenTable;
+    public static float[] rookTable;
+
+    public const float kingTableScale = 0.1f;
+    public const float pawnTableScale = 0.1f;
+    public const float bishopTableScale = 0.1f;
+    public const float knightTableScale = 0.1f;
+    public const float queenTableScale = 0.1f;
+    public const float rookTableScale = 0.1f;
+
 
     public static Dictionary<char, int> FENPieceNames = new Dictionary<char, int>
     {
@@ -55,6 +78,19 @@ public static class Constants
             EdgeDistanceArray[i, 6] = file;
             EdgeDistanceArray[i, 7] = Mathf.Min(file, 7 - rank);
         }
+        
+        kingTable = Resources.Load<PositionWeightTable>("Position Tables/King").table;
+        kingTable_endgame = Resources.Load<PositionWeightTable>("Position Tables/King_Endgame").table;
+        
+        pawnTable = Resources.Load<PositionWeightTable>("Position Tables/Pawn").table; 
+        
+        bishopTable = Resources.Load<PositionWeightTable>("Position Tables/Bishop").table; 
+        
+        knightTable = Resources.Load<PositionWeightTable>("Position Tables/Knight").table; 
+        
+        queenTable = Resources.Load<PositionWeightTable>("Position Tables/Queen").table; 
+        
+        rookTable = Resources.Load<PositionWeightTable>("Position Tables/Rook").table;
     }
     
     public static int DirectionToOffset(int dir)

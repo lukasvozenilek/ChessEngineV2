@@ -7,18 +7,21 @@ using System.Threading.Tasks;
 
 public class Minimax : Player
 {
-    private int alphaPrunes;
-    private int betaPrunes;
-    private int movesEvaluated;
+    public int alphaPrunes;
+    public int betaPrunes;
+    public int movesEvaluated;
     
     private const float worstEval = -10000;
     public const float bestEval = 10000;
 
     private int depth;
 
+    public Evaluator evaluator;
+
     public Minimax(Board board, int depth) : base(board)
     {
         this.depth = depth;
+        evaluator = new Evaluator(board);
     }
 
 
@@ -62,7 +65,7 @@ public class Minimax : Player
     }
 
 
-    private void RunMinimaxSearch()
+    public void RunMinimaxSearch()
     {
         Debug.Log("Starting Threaded Minimax Search!");
         moveEvaluation.Clear();
@@ -76,7 +79,7 @@ public class Minimax : Player
             InvokeMoveComplete(null);
             return;
         }
-
+        
         OrderMoves(legalMoves);
         foreach (Move move in legalMoves.ToList())
         {
@@ -100,7 +103,7 @@ public class Minimax : Player
         {
             int perspective = board.turn ? -1 : 1;
             movesEvaluated += 1;
-            return perspective * Evaluation.EvaluateBoard(board);
+            return perspective * evaluator.EvaluateBoard();
         }
         List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
         int totalMoves = legalMoves.Count;
