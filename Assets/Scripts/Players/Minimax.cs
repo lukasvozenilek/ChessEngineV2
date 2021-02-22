@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using System.Threading;
 using System.Threading.Tasks;
 
 public class Minimax : Player
@@ -72,7 +71,7 @@ public class Minimax : Player
         alphaPrunes = 0;
         betaPrunes = 0;
         movesEvaluated = 0;
-        List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
+        List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(board));
         if (legalMoves.Count == 0)
         {
             Debug.Log("No legal moves found");
@@ -81,10 +80,11 @@ public class Minimax : Player
         }
         
         OrderMoves(legalMoves);
-        foreach (Move move in legalMoves.ToList())
+        foreach (Move move in legalMoves)
         {
             board.MakeMove(move, false);
-            float eval = -Search(depth-1, depth-1, worstEval, bestEval );
+            //float eval = -Search(depth-1, depth-1, worstEval, bestEval );
+            float eval = -Search(depth-1, depth-1, worstEval, bestEval , true);
             moveEvaluation.Add(move, eval);
             board.UnmakeMove();
         }
@@ -96,7 +96,75 @@ public class Minimax : Player
         
         InvokeMoveComplete(board.MakeMove(bestMove));
     }
+    
+    
+    private float Search(int depthlept, int startdepth, float alpha, float beta, bool maximize)
+    {
+        if (depthlept == 0)
+        {
+            movesEvaluated += 1;
+            return evaluator.EvaluateBoard();
+        }
+        
+        List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(board));
+        int totalMoves = legalMoves.Count;
+        if (totalMoves == 0)
+        {
+            //If in check, this is checkmate
+            if (moveGenerator.checkSquaresBB > 0)
+            {
+                //Value sooner checkmates as much worse for the attacked player
+                return (1 + startdepth-depthlept) * (2 - Constants.depthLoss) * worstEval;
+            }
+            //Stalemate
+            return 0;
+        }
 
+        int i = 0;
+        OrderMoves(legalMoves);
+        if (maximize)
+        {
+            float maxScore = worstEval;
+            foreach (Move move in legalMoves)
+            {
+                i++;
+                board.MakeMove(move);
+                float score = Search(depthlept - 1, startdepth, alpha, beta, false);
+                maxScore = Math.Max(score, maxScore);
+                alpha = Math.Max(alpha, score);
+                if (alpha >= beta)
+                {
+                    alphaPrunes += totalMoves - i;
+                    board.UnmakeMove();
+                    return beta;
+                }
+                board.UnmakeMove();
+            }
+            return (maxScore);
+        }
+        else
+        {
+            float minScore = bestEval;
+            foreach (Move move in legalMoves)
+            {
+                i++;
+                board.MakeMove(move);
+                float score = Search(depthlept - 1, startdepth, alpha, beta, true);
+                minScore = Math.Min(score, minScore);
+                beta = Math.Min(beta, score);
+                if (beta <= alpha)
+                {
+                    betaPrunes += totalMoves - i;
+                    board.UnmakeMove();
+                    return alpha;
+                }
+                board.UnmakeMove();
+            }
+            return (minScore);
+        }
+    }
+
+    /*
     private float Search(int depthlept, int startdepth, float alpha, float beta)
     {
         if (depthlept == 0)
@@ -105,7 +173,7 @@ public class Minimax : Player
             movesEvaluated += 1;
             return perspective * evaluator.EvaluateBoard();
         }
-        List<Move> legalMoves = moveGenerator.GetAllLegalMoves(board);
+        List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(board));
         int totalMoves = legalMoves.Count;
         if (totalMoves == 0)
         {
@@ -120,7 +188,9 @@ public class Minimax : Player
 
         int i = 0;
         OrderMoves(legalMoves);
-        foreach (Move move in legalMoves.ToList())
+        
+        
+        foreach (Move move in legalMoves)
         {
             i++;
             board.MakeMove(move, false);
@@ -147,88 +217,6 @@ public class Minimax : Player
         }
         return alpha;
     }
+    */
 }
 
-
-/*
- //ABMax algorithm from From ChessEngine V1
- def LukasEngine(board, depth):
-    global moves_checked
-    starttime = time.time()
-    # If white, pick a random first move from the list
-    with console.status("[bold green]Analyzing moves...") as status:
-        if board.fullmove_number == 1 and board.turn:
-            move = board.parse_san(openingmoves[random.randrange(0, len(openingmoves), 1)])
-        else:
-            move = abmax(board, None, -10000, 10000, True, int(depth), None)[0]
-    # log()(f'{moves_checked:,}' + " possible moves analysed!")
-    # log()(f'{moves_checked / (time.time() - starttime):,}' " moves/second")
-    moves_checked = 0
-    return move
- 
- def abmax(board, move, alpha, beta, maximize, depthleft, material):
-    if material is None:
-        material = evaluatematerial(board)
-
-    # If on last depth return just the evaluation of the given move
-    if depthleft == 0:
-        score = evaluatemove(board, move, material)
-        if maximize:
-            score = -score
-        return move, score
-
-    pushed = False
-    if move is not None:
-        thismovescore = evaluatemove(board, move, material)
-        board.push(move)
-        pushed = True
-    else:
-        thismovescore = None
-
-    if board.legal_moves.count() == 0:
-        board.pop()
-        if move is not None:
-            if maximize:
-                thismovescore = -thismovescore
-            return move, thismovescore
-        else:
-            return ("", 0)
-
-    if maximize:
-        maxScore = -10000
-        for move in presort(board, board.legal_moves):
-            #print("\nNow analyzing next upper move ^" + str(move))
-            #print("Starting AB: " + str(alpha) + " " + str(beta))
-            score = depth_penalty * abmax(board, move, alpha, beta, False, depthleft - 1, material)[1]
-            if (thismovescore is not None):
-                score -= thismovescore
-            if not pushed:
-                #print("Results of upper move ^" + str(move) + " are " + str(score))
-                console.log("Results of upper move ^" + str(move) + " are " + str(score))
-            if score > maxScore:
-                bestmove = move
-            maxScore = max(score, maxScore)
-            alpha = max(alpha, score)
-            if alpha >= beta:
-                break
-        if pushed:
-            board.pop()
-        return (bestmove, maxScore)
-    else:
-        minScore = 10000
-        for move in presort(board, board.legal_moves):
-            score = depth_penalty * abmax(board, move, alpha, beta, True, depthleft - 1, material)[1]
-            if (thismovescore is not None):
-                score += thismovescore
-            if score < minScore:
-                worstMove = move
-            minScore = min(score, minScore)
-            beta = min(beta, score)
-            if beta <= alpha:
-                break
-        if pushed:
-            board.pop()
-        return worstMove, minScore
-
- 
- */

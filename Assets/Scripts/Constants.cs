@@ -15,6 +15,8 @@ public static class Constants
     public const int BishopValue = 3;
     public const int RookValue = 5;
 
+    public const float depthLoss = 0.95f;
+
 
     public static float[] kingTable;
     public static float[] kingTable_endgame;

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// ChessBoard.cs is the monobehaviour responsible for the graphical representation of the board
@@ -31,7 +27,6 @@ public class ChessBoard : MonoBehaviour
     public bool canMoveBlackPieces;
 
     public UserInterface userInterfaceComponent;
-
     
     void Start()
     {
@@ -67,7 +62,7 @@ public class ChessBoard : MonoBehaviour
                 whitePlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                whitePlayer = new Minimax(board, 5);
+                whitePlayer = new Minimax(board, 6);
                 break;
             case PlayerType.MonteCarlo:
                 whitePlayer = new MonteCarlo(board);
@@ -86,7 +81,7 @@ public class ChessBoard : MonoBehaviour
                 blackPlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                blackPlayer = new Minimax(board, 5);
+                blackPlayer = new Minimax(board, 6);
                 break;
             case PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);
@@ -156,7 +151,8 @@ public class ChessBoard : MonoBehaviour
             if (blackPlayer.moveEvaluation.Count > 0)
             {
                 userInterfaceComponent.UpdateUIEval(true,new Dictionary<Move, float>(blackPlayer.moveEvaluation));
-            } else if (whitePlayer.moveEvaluation.Count > 0)
+            } 
+            else if (whitePlayer.moveEvaluation.Count > 0)
             {
                 userInterfaceComponent.UpdateUIEval(false, new Dictionary<Move, float>(whitePlayer.moveEvaluation));
             } 
@@ -403,6 +399,4 @@ public class ChessBoard : MonoBehaviour
             }
         }
     }
-
-    
 }

@@ -59,7 +59,7 @@ public class UserInterface : MonoBehaviour
         string text = (color ? "Black" : "White") + ":\n";
         foreach (KeyValuePair<Move, float> eval in evals)
         {
-            text += Constants.MoveToString(eval.Key) + ": " + Math.Round(eval.Value, 2) + "\n";
+            text += Constants.MoveToString(eval.Key) + ": " + Math.Round(eval.Value, 3) + "\n";
         }
         evaluationText.text = text;
     }
