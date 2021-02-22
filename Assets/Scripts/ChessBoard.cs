@@ -25,7 +25,7 @@ public class ChessBoard : MonoBehaviour
     
     public AudioSource audioSource;
 
-    public Board board = null;
+    public Board board;
 
     public bool canMoveWhitePieces;
     public bool canMoveBlackPieces;
@@ -67,7 +67,7 @@ public class ChessBoard : MonoBehaviour
                 whitePlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                whitePlayer = new Minimax(board, 6);
+                whitePlayer = new Minimax(board, 5);
                 break;
             case PlayerType.MonteCarlo:
                 whitePlayer = new MonteCarlo(board);
@@ -86,7 +86,7 @@ public class ChessBoard : MonoBehaviour
                 blackPlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                blackPlayer = new Minimax(board, 6);
+                blackPlayer = new Minimax(board, 5);
                 break;
             case PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);
@@ -231,7 +231,20 @@ public class ChessBoard : MonoBehaviour
             CreateOverlayFromBB(moveGenerator.pinnedSquaresBB);
         }
         
-        
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            List<int> squareList = new List<int>();
+            squareList.Clear();
+            foreach (KeyValuePair<int, int> piece in board.blackPieces)
+            {
+                squareList.Add(piece.Key);
+            }
+            foreach (KeyValuePair<int, int> piece in board.whitePieces)
+            {
+                squareList.Add(piece.Key);
+            }
+            CreateOverlayFromSquares(squareList);
+        }
     }
 
 

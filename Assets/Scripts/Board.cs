@@ -25,9 +25,12 @@ public class Board
     public event Action boardUpdatedEvent;
     public event Action gameOverEvent;
 
-    public List<int> whitePieces = new List<int>();
-    public List<int> blackPieces = new List<int>();
-
+    public Dictionary<int, int> whitePieces = new Dictionary<int, int>();
+    public int whiteMat;
+    
+    public Dictionary<int, int> blackPieces = new Dictionary<int, int>();
+    public int blackMat;
+    
     private MoveGenerator moveGenerator;
 
 
@@ -76,7 +79,6 @@ public class Board
     {
         BoardResult = BOARD_PROGR;
         moveGenerator = new MoveGenerator();
-        GeneratePieceLists();
     }
 
     public void ResetCastlingRights()
@@ -87,22 +89,12 @@ public class Board
         castling_bq = true;
     }
 
-    public void GeneratePieceLists()
-    {
-        for (int i = 0; i < 64; i++)
-        {
-            if (!Piece.IsType(Squares[i], Piece.None))
-            {
-                if (GetPieceColor(i)) blackPieces.Add(i);
-                else whitePieces.Add(i);
-            }
-        }
-    }
-
     public void ClearBoard()
     {
         for (int i = 0; i < 64; i++) Squares[i] = Piece.None; 
         moves.Clear();
+        whitePieces.Clear();
+        blackPieces.Clear();
     }
 
     public void LoadPositionFromFEN(string fen)
@@ -130,9 +122,18 @@ public class Board
                 }
                 else
                 {
-                    int pieceid = char.IsUpper(item) ? Piece.White : Piece.Black;
+                    bool color = char.IsUpper(item);
+                    int pieceid = color ? Piece.White : Piece.Black;
                     pieceid += Constants.FENPieceNames[char.ToLower(item)];
                     Squares[boardpos] = pieceid;
+                    if (color)
+                    {
+                        whitePieces.Add(boardpos, pieceid);
+                    }
+                    else
+                    {
+                        blackPieces.Add(boardpos, pieceid);
+                    }
                     boardpos++;
                 }
             }
@@ -293,6 +294,8 @@ public class Board
         result.castlingRights.w_qs = castling_wq; 
         
         result.move = move;
+
+        int movedPiece = Squares[move.StartSquare];
         
         //Losing castling rights due to king and rook moves.
         if (castling_wq && (move.StartSquare == 0 || move.StartSquare == 4))
@@ -323,10 +326,20 @@ public class Board
         result.capture = Squares[move.DestinationSquare] != Piece.None;
         
         //Execute enpassent move
-        if (Piece.IsType(Squares[move.StartSquare], Piece.Pawn) &&  (move.StartSquare%8 != move.DestinationSquare%8 )&& Squares[move.DestinationSquare] == Piece.None)
+        if (Piece.IsType(movedPiece, Piece.Pawn) &&  (move.StartSquare%8 != move.DestinationSquare%8 ) && Squares[move.DestinationSquare] == Piece.None)
         {
             int offset = GetPieceColor(move.StartSquare) ? 8 : -8;
             Squares[move.DestinationSquare + offset] = Piece.None;
+
+            if (turn)
+            {
+                whitePieces.Remove(move.DestinationSquare + offset);
+            }
+            else
+            {
+                blackPieces.Remove(move.DestinationSquare + offset);
+            }
+            
             result.capturedPiece = Piece.Pawn + (GetPieceColor(move.StartSquare) ? Piece.White : Piece.Black);
             result.enpassant = true;
             result.capture = true;
@@ -353,13 +366,17 @@ public class Board
                 if (Squares[move.DestinationSquare + 1] != Piece.None)
                 {
                     Squares[61] = Squares[63];
+                    blackPieces.Add(61,Squares[63]);
                     Squares[63] = Piece.None;
+                    blackPieces.Remove(63);
                     result.castle = true;
                 }
                 else
                 {
                     Squares[59] = Squares[56];
+                    blackPieces.Add(59,Squares[56]);
                     Squares[56] = Piece.None;
+                    blackPieces.Remove(56);
                     result.castle = true;
                 }
             }
@@ -369,13 +386,17 @@ public class Board
                 if (Squares[move.DestinationSquare + 1] != Piece.None)
                 {
                     Squares[5] = Squares[7];
+                    whitePieces.Add(5,Squares[7]);
                     Squares[7] = Piece.None;
+                    whitePieces.Remove(7);
                     result.castle = true;
                 }
                 else
                 {
                     Squares[3] = Squares[0];
+                    whitePieces.Add(3, Squares[0]);
                     Squares[0] = Piece.None;
+                    whitePieces.Remove(0);
                     result.castle = true;
                 }
             }
@@ -385,6 +406,28 @@ public class Board
         {
             Squares[move.DestinationSquare] = move.promotionID + (turn? Piece.Black : Piece.White);
         }
+        
+        
+        //Update piece dictionary
+        if (turn)
+        {
+            blackPieces.Remove(move.StartSquare);
+            blackPieces.Add(move.DestinationSquare,movedPiece);
+            if (result.capture)
+            {
+                whitePieces.Remove(move.DestinationSquare);
+            }
+        }
+        else
+        {
+            whitePieces.Remove(move.StartSquare);
+            whitePieces.Add(move.DestinationSquare, movedPiece);
+            if (result.capture)
+            {
+                blackPieces.Remove(move.DestinationSquare);
+            }
+        }
+        
         
         
         //Finally, add move to records and update turn.
@@ -399,6 +442,21 @@ public class Board
         if (moves.Count == 0) return;
         MoveResult lastMove = moves[moves.Count-1];
 
+        int movedPiece = Squares[lastMove.move.DestinationSquare];
+        
+        if (turn)
+        {
+            whitePieces.Remove(lastMove.move.DestinationSquare);
+            whitePieces.Add(lastMove.move.StartSquare, movedPiece);
+        }
+        else
+        {
+            blackPieces.Remove(lastMove.move.DestinationSquare);
+            blackPieces.Add(lastMove.move.StartSquare,movedPiece);
+        }
+        
+        
+        
         if (lastMove.move.promotionID != Piece.None)
         {
             Squares[lastMove.move.StartSquare] = Piece.Pawn + (turn ? Piece.White : Piece.Black);
@@ -413,6 +471,14 @@ public class Board
             Squares[lastMove.move.DestinationSquare] = Piece.None;
             int offset = GetPieceColor(lastMove.move.StartSquare) ? 8 : -8;
             Squares[lastMove.move.DestinationSquare + offset] = lastMove.capturedPiece;
+            if (turn)
+            {
+                blackPieces.Add(lastMove.move.DestinationSquare + offset, lastMove.capturedPiece);
+            }
+            else
+            {
+                whitePieces.Add(lastMove.move.DestinationSquare + offset, lastMove.capturedPiece);
+            }
         }
         else if (lastMove.castle)
         {
@@ -422,12 +488,16 @@ public class Board
                 if (Squares[lastMove.move.DestinationSquare + 1] == Piece.None)
                 {
                     Squares[63] = Squares[61];
+                    blackPieces.Add(63, Squares[61]);
                     Squares[61] = Piece.None;
+                    blackPieces.Remove(61);
                 }
                 else
                 {
                     Squares[56] = Squares[59];
+                    blackPieces.Add(56, Squares[59]);
                     Squares[59] = Piece.None;
+                    blackPieces.Remove(59);
                 }
 
             }
@@ -437,13 +507,16 @@ public class Board
                 if (Squares[lastMove.move.DestinationSquare + 1] == Piece.None)
                 {
                     Squares[7] = Squares[5];
+                    whitePieces.Add(7, Squares[5]);
                     Squares[5] = Piece.None;
-                    
+                    whitePieces.Remove(5);
                 }
                 else
                 {
                     Squares[0] = Squares[3];
+                    whitePieces.Add(0, Squares[3]);
                     Squares[3] = Piece.None;
+                    whitePieces.Remove(3);
                 }
             }
             Squares[lastMove.move.DestinationSquare] = Piece.None;
@@ -451,6 +524,17 @@ public class Board
         else
         {
             Squares[lastMove.move.DestinationSquare] = lastMove.capturedPiece;
+            if (lastMove.capture)
+            {
+                if (turn)
+                {
+                    blackPieces.Add(lastMove.move.DestinationSquare, lastMove.capturedPiece);
+                }
+                else
+                {
+                    whitePieces.Add(lastMove.move.DestinationSquare, lastMove.capturedPiece);
+                }
+            }
         }
         
         //Restore previous castling rights

@@ -1,0 +1,23 @@
+Constants
+Algorithm: Minimax
+Position: Starting
+Depth: 5
+Platform: Editor
+
+Just legal moves:
+142 seconds
+
+Legal moves and evaluation:
+370 seconds
+
+Legal moves, evaluation, and AB pruning:
+12.3 seconds
+
+Legal moves, evaluation, AB pruning, and simple move ordering:
+8.15 seconds
+
+Legal moves, evaluation, AB pruning, simple move ordering, and piece caching:
+6.8 seconds
+
+Legal moves, evaluation, AB pruning, simple move ordering, piece caching and transposition tables:
+

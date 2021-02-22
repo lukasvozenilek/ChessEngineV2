@@ -22,14 +22,13 @@ public class MoveGenerator
         attackedLineBB = 0;
         pinnedKingSquare = -1;
         
-
-        //TODO: Cache piece locations so we don't have to iterate 64 times.
         int destSquare;
-        for (int square = 0; square < 64; square++)
+        foreach (KeyValuePair<int, int> pieceKVP in player? board.blackPieces : board.whitePieces)
         {
+            int square = pieceKVP.Key;
+            int piece = pieceKVP.Value;
             if (!Piece.IsType(board.Squares[square], Piece.None) && board.GetPieceColor(square) == player)
             {
-                int piece = board.Squares[square];
                 switch (Piece.GetType(piece))
                 {
                     case Piece.Knight:
@@ -172,10 +171,10 @@ public class MoveGenerator
     {
         legalMoves.Clear();
         CalculateAttacks(board, !board.turn);
-
-        //TODO: Cache piece locations so we don't have to iterate 64 times.
-        for (int square = 0; square < 64; square++)
+        
+        foreach (KeyValuePair<int, int> pieceKVP in board.turn? board.blackPieces : board.whitePieces)
         {
+            int square = pieceKVP.Key;
             //Only iterate through squares that contain my own piece
             if (!Piece.IsType(board.Squares[square], Piece.None) && board.GetPieceColor(square) == board.turn)
             {

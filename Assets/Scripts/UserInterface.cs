@@ -40,7 +40,6 @@ public class UserInterface : MonoBehaviour
         
         perft = new PERFT();
         speedTest = new SpeedTest();
-        speedTest.testCompleteCallback += SpeedtestCompleteCallback;
     }
 
     public void StartSpeedTest()
@@ -48,25 +47,6 @@ public class UserInterface : MonoBehaviour
         speedTest.RunSpeedtest();
     }
 
-    public void SpeedtestCompleteCallback(List<MinimaxSpeedTestResult> results)
-    {
-        int i = 0;
-        MinimaxSpeedTestResult averageResult = new MinimaxSpeedTestResult();
-        foreach (MinimaxSpeedTestResult testResult in results)
-        {
-            Debug.Log(testResult.EvaluatedMoves);
-            averageResult.EvaluatedMoves += testResult.EvaluatedMoves;
-            averageResult.AlphaPrunedMoves += testResult.AlphaPrunedMoves;
-            averageResult.BetaPrunedMoves += testResult.BetaPrunedMoves;
-            averageResult.ElapsedTime += testResult.ElapsedTime;
-        }
-        
-        Debug.Log("Average evaluated moves: " + averageResult.EvaluatedMoves/3f);
-        Debug.Log("Average alpha pruned moves: " + averageResult.AlphaPrunedMoves/3f);
-        Debug.Log("Average beta pruned moves: " + averageResult.BetaPrunedMoves/3f);
-        Debug.Log("Average time: " + averageResult.ElapsedTime/3f);
-    }
-    
     public void StartNewGame()
     {
         GameConfiguration config = new GameConfiguration((PlayerType)player1dropdown.value, (PlayerType)player2dropdown.value);
