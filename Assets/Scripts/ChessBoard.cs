@@ -8,6 +8,13 @@ using UnityEngine.Tilemaps;
 /// </summary>
 public class ChessBoard : MonoBehaviour
 {
+    //AI depth of 5 in editor, 6 in build
+    #if UNITY_EDITOR
+    public const int AIDepth = 5;
+    #else
+    public const int AIDepth = 6;  
+    #endif
+    
     public BoardConfig boardConfig;
     public Tilemap whiteSquares;
     public Tilemap blackSquares;
@@ -62,7 +69,7 @@ public class ChessBoard : MonoBehaviour
                 whitePlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                whitePlayer = new Minimax(board, 6);
+                whitePlayer = new Minimax(board, AIDepth);
                 break;
             case PlayerType.MonteCarlo:
                 whitePlayer = new MonteCarlo(board);
@@ -81,7 +88,7 @@ public class ChessBoard : MonoBehaviour
                 blackPlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.Minimax:
-                blackPlayer = new Minimax(board, 6);
+                blackPlayer = new Minimax(board, AIDepth);
                 break;
             case PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);

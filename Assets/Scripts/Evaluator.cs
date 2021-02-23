@@ -46,7 +46,13 @@ public class Evaluator
                 return Constants.queenTableScale * Constants.queenTable[pieceColor? 63-square:square];
             case Piece.King:
                 int index = pieceColor ? 63 - square : square;
-                return Constants.kingTableScale * (endgame? Constants.kingTable_endgame[index]: Constants.kingTable[index]);
+                bool isLosing = (board.turn ? board.whiteMat - board.blackMat : board.blackMat - board.whiteMat) > 0;
+                if (endgame)
+                {
+                    if (isLosing) return Constants.kingTableScale * Constants.kingTable_endgame[index];
+                    return 0;
+                }
+                return Constants.kingTableScale * Constants.kingTable[index];
             default:
                 return 0;
         }

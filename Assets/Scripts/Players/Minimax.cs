@@ -4,6 +4,20 @@ using System.Linq;
 using UnityEngine;
 using System.Threading.Tasks;
 
+
+public struct SearchResult
+{
+    public float Eval;
+    public Move move;
+
+    public SearchResult(float Eval)
+    {
+        this.Eval = Eval;
+        this.move = new Move();
+    }
+}
+
+
 public class Minimax : Player
 {
     public int alphaPrunes;
@@ -63,7 +77,6 @@ public class Minimax : Player
         }
     }
 
-
     public void RunMinimaxSearch()
     {
         Debug.Log("Starting Threaded Minimax Search!");
@@ -79,31 +92,23 @@ public class Minimax : Player
             return;
         }
         
-        OrderMoves(legalMoves);
-        foreach (Move move in legalMoves)
-        {
-            board.MakeMove(move, false);
-            //float eval = -Search(depth-1, depth-1, worstEval, bestEval );
-            float eval = -Search(depth-1, depth-1, worstEval, bestEval , true);
-            moveEvaluation.Add(move, eval);
-            board.UnmakeMove();
-        }
+        SearchResult result = Search(depth, depth, worstEval, bestEval, !board.turn);
+        
 
         Debug.Log("Total moves evaluated: " + movesEvaluated);
         Debug.Log("Alpha prunes: " + alphaPrunes);
         Debug.Log("Beta prunes: " + betaPrunes);
-        Move bestMove = moveEvaluation.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         
-        InvokeMoveComplete(board.MakeMove(bestMove));
+        InvokeMoveComplete(board.MakeMove(result.move));
     }
     
     
-    private float Search(int depthlept, int startdepth, float alpha, float beta, bool maximize)
+    private SearchResult Search(int depthlept, int startdepth, float alpha, float beta, bool maximize)
     {
         if (depthlept == 0)
         {
             movesEvaluated += 1;
-            return evaluator.EvaluateBoard();
+            return new SearchResult(evaluator.EvaluateBoard());
         }
         
         List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(board));
@@ -114,53 +119,77 @@ public class Minimax : Player
             if (moveGenerator.checkSquaresBB > 0)
             {
                 //Value sooner checkmates as much worse for the attacked player
-                return (1 + startdepth-depthlept) * (2 - Constants.depthLoss) * worstEval;
+                return new SearchResult(-5000f + (startdepth-depthlept));
             }
             //Stalemate
-            return 0;
+            return new SearchResult(0);
         }
 
         int i = 0;
         OrderMoves(legalMoves);
         if (maximize)
         {
-            float maxScore = worstEval;
+            SearchResult bestResult = new SearchResult(worstEval);
             foreach (Move move in legalMoves)
             {
                 i++;
                 board.MakeMove(move);
-                float score = Search(depthlept - 1, startdepth, alpha, beta, false);
-                maxScore = Math.Max(score, maxScore);
-                alpha = Math.Max(alpha, score);
+                SearchResult result = Search(depthlept - 1, startdepth, alpha, beta, false);
+                result.move = move;
+
+                if (startdepth - depthlept == 0)
+                {
+                    moveEvaluation.Add(result.move, result.Eval);
+                }
+
+                if (result.Eval > bestResult.Eval)
+                {
+                    bestResult = result;
+                }
+                
+                alpha = Math.Max(alpha, result.Eval);
                 if (alpha >= beta)
                 {
-                    alphaPrunes += totalMoves - i;
+                    //Beta cutoff
+                    betaPrunes += totalMoves - i;
                     board.UnmakeMove();
-                    return beta;
+                    break;
                 }
                 board.UnmakeMove();
             }
-            return (maxScore);
+            return bestResult;
         }
         else
         {
-            float minScore = bestEval;
+            SearchResult worstResult = new SearchResult(bestEval);
             foreach (Move move in legalMoves)
             {
                 i++;
                 board.MakeMove(move);
-                float score = Search(depthlept - 1, startdepth, alpha, beta, true);
-                minScore = Math.Min(score, minScore);
-                beta = Math.Min(beta, score);
+                SearchResult result = Search(depthlept - 1, startdepth, alpha, beta, true);
+                result.move = move;
+                
+                if (startdepth - depthlept == 0)
+                {
+                    moveEvaluation.Add(result.move, result.Eval);
+                }
+                
+                if (result.Eval < worstResult.Eval)
+                {
+                    worstResult = result;
+                }
+                
+                beta = Math.Min(beta, result.Eval);
                 if (beta <= alpha)
                 {
-                    betaPrunes += totalMoves - i;
+                    //Alpha cutoff
+                    alphaPrunes += totalMoves - i;
                     board.UnmakeMove();
-                    return alpha;
+                    break;
                 }
                 board.UnmakeMove();
             }
-            return (minScore);
+            return worstResult;
         }
     }
 

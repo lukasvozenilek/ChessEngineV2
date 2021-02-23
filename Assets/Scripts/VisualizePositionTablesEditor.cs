@@ -29,6 +29,7 @@ public class VisualizePositionTablesEditor : Editor
                 overlay.labelRef.gameObject.SetActive(true);
                 overlay.labelRef.text = i.ToString();
                 GO.transform.position = monoRef.gridComponent.CellToWorld(new Vector3Int(i%8, i/8, 1)) + monoRef.gridComponent.cellSize/2;
+                GO.transform.position = new Vector3(GO.transform.position.x, GO.transform.position.y, -1);
                 monoRef.allObjects.Add(GO);
             }
             

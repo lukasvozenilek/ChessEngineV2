@@ -22,5 +22,7 @@ Piece caching using dictionaries:
 Legal moves list generated from new list, instead of using .ToList() later:
 6 seconds
 
+Fixed alpha pruning:
+1.4 seconds!!
 
 
