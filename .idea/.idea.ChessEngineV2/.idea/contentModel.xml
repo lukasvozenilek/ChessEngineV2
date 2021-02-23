@@ -24,7 +24,7 @@
           <e p="PieceGO.cs" t="Include" />
           <e p="Players" t="Include">
             <e p="HumanPlayer.cs" t="Include" />
-            <e p="Minimax.cs" t="Include" />
+            <e p="LukasEngine.cs" t="Include" />
             <e p="MonteCarlo.cs" t="Include" />
             <e p="Player.cs" t="Include" />
             <e p="Random.cs" t="Include" />

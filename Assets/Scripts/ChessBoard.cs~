@@ -88,7 +88,7 @@ public class ChessBoard : MonoBehaviour
                 blackPlayer = new Players.HumanPlayer(board, this);
                 break;
             case PlayerType.LukasEngine:
-                blackPlayer = new LukasEngine(board, gameconfig.player2Diff * 1000);
+                blackPlayer = new LukasEngine(board, gameconfig.player1Diff * 1000);
                 break;
             case PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);

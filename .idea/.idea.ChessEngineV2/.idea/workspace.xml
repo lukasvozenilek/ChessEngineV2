@@ -42,7 +42,6 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/AIPlayer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Minimax.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/HumanPlayer.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/GameConfiguration.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Player.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MonteCarlo.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/PERFT.cs" />
@@ -54,19 +53,21 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Players/Random.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Players/HumanPlayer.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Players/Player.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Players/Stockfish.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameOverWindow.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluation.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/SpeedTest.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MoveGenerator.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/VisualizePositionTablesEditor.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluator.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Players/Minimax.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Players/Player.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/GameConfiguration.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
       </list>
     </option>
   </component>
@@ -148,7 +149,8 @@
       <workItem from="1613947452023" duration="7486000" />
       <workItem from="1613959091663" duration="910000" />
       <workItem from="1613960917601" duration="1336000" />
-      <workItem from="1614024907099" duration="10985000" />
+      <workItem from="1614024907099" duration="11382000" />
+      <workItem from="1614063946374" duration="7824000" />
     </task>
     <servers />
   </component>
@@ -245,9 +247,9 @@
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
     <state x="936" y="250" key="run.anything.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613947234392" />
-    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1614036327528">
+    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1614067308940">
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
-    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614036327528" />
+    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614067308940" />
   </component>
 </project>

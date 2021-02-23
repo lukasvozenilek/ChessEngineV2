@@ -8,7 +8,7 @@ using UnityEngine;
 public class SpeedTest
 {
     private Board board;
-    private Minimax minimax;
+    private LukasEngine m_LukasEngine;
     private const int numberOfTests = 3;
     private int currentIteration = 0;
     private float startTime;
@@ -18,12 +18,12 @@ public class SpeedTest
     public void RunSpeedtest()
     {
         board = new Board();
-        minimax = new Minimax(board, 6);
-        minimax.MoveCompleteEvent += MinimaxDoneCallback;
+        m_LukasEngine = new LukasEngine(board, 6);
+        m_LukasEngine.MoveCompleteEvent += LukasEngineDoneCallback;
         Debug.Log("Running speed test");
         currentIteration = 0;
         startTime = Time.realtimeSinceStartup;
-        minimax.PlayMove();
+        m_LukasEngine.PlayMove();
         TestRunning = true;
         while (TestRunning)
         {
@@ -31,7 +31,7 @@ public class SpeedTest
         Debug.Log("Speed test complete. Took: " + (Time.realtimeSinceStartup - startTime));
     }
 
-    public void MinimaxDoneCallback(MoveResult? moveResult)
+    public void LukasEngineDoneCallback(MoveResult? moveResult)
     {
         TestRunning = false;
     }

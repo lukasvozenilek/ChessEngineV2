@@ -20,7 +20,8 @@ public class UserInterface : MonoBehaviour
     public TMP_Dropdown player1dropdown;
     public TMP_Dropdown player2dropdown;
     public TMP_InputField FENInput;
-    
+    public TMP_Dropdown player1Diff;
+    public TMP_Dropdown player2Diff;
 
     [Header("Right pane")] 
     [Header("Evaluation")]
@@ -31,12 +32,17 @@ public class UserInterface : MonoBehaviour
     public GameObject canvasComponent;
     public void Start()
     {
+        //Control objects
         canvasComponent.SetActive(true);
         gameOverWindowRef.gameObject.SetActive(false);
+        
+        //Subscribe events
         runPerftButton.onClick.AddListener(RunPERFT);
         runSpeedButton.onClick.AddListener(StartSpeedTest);
         newGameButton.onClick.AddListener(StartNewGame);
         gameOverWindowRef.closeButton.onClick.AddListener(CloseGameResultWindow);
+        player1dropdown.onValueChanged.AddListener(OnPlayer1Changed);
+        player2dropdown.onValueChanged.AddListener(OnPlayer2Changed);
         
         perft = new PERFT();
         speedTest = new SpeedTest();
@@ -47,16 +53,25 @@ public class UserInterface : MonoBehaviour
         speedTest.RunSpeedtest();
     }
 
+    public void OnPlayer1Changed(int val)
+    {
+        player1Diff.interactable = (PlayerType) val == PlayerType.LukasEngine;
+    }
+    public void OnPlayer2Changed(int val)
+    {
+        player2Diff.interactable = (PlayerType) val == PlayerType.LukasEngine;
+    }
+
     public void StartNewGame()
     {
-        GameConfiguration config = new GameConfiguration((PlayerType)player1dropdown.value, (PlayerType)player2dropdown.value);
+        GameConfiguration config = new GameConfiguration((PlayerType)player1dropdown.value, (PlayerType)player2dropdown.value, player1Diff.value+1, player2Diff.value+1);
         config.startingFEN = String.IsNullOrEmpty(FENInput.text)? Constants.startingFEN : FENInput.text ;
         chessBoardRef.StartNewGame(config);
     }
     
-    public void UpdateUIEval(bool color, Dictionary<Move,float> evals)
+    public void UpdateUIEval(bool color, Dictionary<Move,float> evals, int depth)
     {
-        string text = (color ? "Black" : "White") + ":\n";
+        string text = (color ? "Black" : "White") + " at Depth " + depth + ":\n";
         foreach (KeyValuePair<Move, float> eval in evals)
         {
             text += Constants.MoveToString(eval.Key) + ": " + Math.Round(eval.Value, 3) + "\n";

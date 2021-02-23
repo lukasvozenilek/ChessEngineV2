@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Board
@@ -21,9 +22,6 @@ public class Board
     public bool starting_castling_wq;
     public bool starting_castling_bk;
     public bool starting_castling_bq;
-
-    public event Action boardUpdatedEvent;
-    public event Action gameOverEvent;
 
     public Dictionary<int, int> whitePieces = new Dictionary<int, int>();
     public int whiteMat;
@@ -49,6 +47,7 @@ public class Board
         LoadPositionFromFEN(FEN);
         InitBoard();
     }
+    
     //New board from another board
     public Board(Board copyfrom)
     {
@@ -69,6 +68,12 @@ public class Board
         
         //Add move history
         moves.AddRange(copyfrom.moves);
+        
+        //Material
+        whitePieces = new Dictionary<int, int>(copyfrom.whitePieces);
+        whiteMat = copyfrom.whiteMat;
+        blackPieces = new Dictionary<int, int>(copyfrom.blackPieces);
+        blackMat = copyfrom.blackMat;
     
         //Copy turn
         turn = copyfrom.turn;
@@ -401,12 +406,6 @@ public class Board
                 }
             }
         }
-
-        if (move.promotionID != Piece.None)
-        {
-            Squares[move.DestinationSquare] = move.promotionID + (turn? Piece.Black : Piece.White);
-        }
-        
         
         //Update piece dictionary
         if (turn)
@@ -427,9 +426,21 @@ public class Board
                 blackPieces.Remove(move.DestinationSquare);
             }
         }
-        
-        
-        
+
+        if (move.promotionID != Piece.None)
+        {
+            Squares[move.DestinationSquare] = move.promotionID + (turn? Piece.Black : Piece.White);
+            if (turn)
+            {
+                blackPieces[move.DestinationSquare] = move.promotionID + Piece.Black;
+            }
+            else
+            {
+                whitePieces[move.DestinationSquare] = move.promotionID + Piece.White;
+            }
+            
+        }
+
         //Finally, add move to records and update turn.
         moves.Add(result);
         turn = !turn;
@@ -447,22 +458,36 @@ public class Board
         if (turn)
         {
             whitePieces.Remove(lastMove.move.DestinationSquare);
-            whitePieces.Add(lastMove.move.StartSquare, movedPiece);
         }
         else
         {
             blackPieces.Remove(lastMove.move.DestinationSquare);
-            blackPieces.Add(lastMove.move.StartSquare,movedPiece);
         }
-        
-        
-        
+
+
         if (lastMove.move.promotionID != Piece.None)
         {
+            if (turn)
+            {
+                whitePieces.Add(lastMove.move.StartSquare,movedPiece + Piece.White);
+            }
+            else
+            {
+                blackPieces.Add(lastMove.move.StartSquare,movedPiece + Piece.Black);
+            }
+            
             Squares[lastMove.move.StartSquare] = Piece.Pawn + (turn ? Piece.White : Piece.Black);
         }
         else
         {
+            if (turn)
+            {
+                whitePieces.Add(lastMove.move.StartSquare,movedPiece);
+            }
+            else
+            {
+                blackPieces.Add(lastMove.move.StartSquare, movedPiece);
+            }
             Squares[lastMove.move.StartSquare] = Squares[lastMove.move.DestinationSquare];
         }
         
