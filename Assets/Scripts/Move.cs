@@ -15,6 +15,7 @@
 public struct MoveResult
 {
     public Move move;
+    public int movedPiece;
     public bool legal;
     public bool capture;
     public int capturedPiece;

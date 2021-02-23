@@ -301,6 +301,7 @@ public class Board
         result.move = move;
 
         int movedPiece = Squares[move.StartSquare];
+        result.movedPiece = movedPiece;
         
         //Losing castling rights due to king and rook moves.
         if (castling_wq && (move.StartSquare == 0 || move.StartSquare == 4))

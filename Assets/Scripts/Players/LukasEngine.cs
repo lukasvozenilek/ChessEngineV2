@@ -33,6 +33,8 @@ public class LukasEngine : Player
 
     public int currentDepth;
 
+    public int maxDepth = 20;
+
     public Board searchBoard;
     public LukasEngine(Board board, int timeLimit) : base(board)
     {
@@ -45,16 +47,15 @@ public class LukasEngine : Player
         Task.Factory.StartNew(() => WaitForTimeUp(), TaskCreationOptions.LongRunning);
     }
 
-    
+    private float alpha;
+    private float beta;
     SearchResult upperResult;
     public void StartDeepeningSearch()
     {
+        ResetVars();
         searchBoard = new Board(board);
         evaluator = new Evaluator(searchBoard);
-        moveEvaluation.Clear();
-        alphaPrunes = 0;
-        betaPrunes = 0;
-        movesEvaluated = 0;
+
         List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(searchBoard));
         if (legalMoves.Count == 0)
         {
@@ -63,12 +64,23 @@ public class LukasEngine : Player
             return;
         }
 
-        for (int i = 1; i < 20; i++)
+
+        for (int i = 1; i < maxDepth; i++)
         {
             currentDepth = i;
-            upperResult = Search(i, i, worstEval, bestEval, true);
+            upperResult = Search(i, i, alpha, beta, true);
             //Debug.Log("Depth " + i + " complete. Best move: " + Constants.MoveToString(upperResult.move) + " with eval: " + upperResult.Eval);
         }
+    }
+
+    private void ResetVars()
+    {
+        moveEvaluation.Clear();
+        alphaPrunes = 0;
+        betaPrunes = 0;
+        movesEvaluated = 0;
+        alpha = worstEval;
+        beta = bestEval;
     }
 
     public async void WaitForTimeUp()
@@ -101,9 +113,9 @@ public class LukasEngine : Player
             {
                 int perspective = maximize? -1 : 1;
                 //Penalize a checkmate by the depth it's reached to achieve it.
-                return new SearchResult(perspective * ( 5000f - (startdepth - depthleft)));
+                return new SearchResult(perspective * ( 5000f - (10 * (startdepth - depthleft))));
             }
-            //Stalemate
+            //Otherwise, draw due to stalemate
             return new SearchResult(0);
         }
 
@@ -197,8 +209,7 @@ public class LukasEngine : Player
         }
         Sort (moves, moveScores);
     }
-    
-    
+
     private void Sort (List<Move> moves, int[] moveScores) {
         for (int i = 0; i < moves.Count - 1; i++) {
             for (int j = i + 1; j > 0; j--) {
