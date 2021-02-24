@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DefaultNamespace;
 using UnityEngine;
 
 public class Board
 {
-    //Board variables
+    //Board variablesm
     public int[] Squares;
     public bool turn;
     public List<MoveResult> moves = new List<MoveResult>();
@@ -31,7 +32,9 @@ public class Board
     
     private MoveGenerator moveGenerator;
 
-
+    public Zobrist zobrist;
+    public ulong currentHash;
+    
     public int BoardResult = BOARD_PROGR;
     
     public const int BOARD_PROGR = 0;
@@ -45,6 +48,8 @@ public class Board
     {
         Squares = new int[64];
         LoadPositionFromFEN(FEN);
+        zobrist = new Zobrist();
+        currentHash = zobrist.HashPosition(this);
         InitBoard();
     }
     
@@ -77,6 +82,10 @@ public class Board
     
         //Copy turn
         turn = copyfrom.turn;
+        
+        //Copy zobrist information
+        currentHash = copyfrom.currentHash;
+        zobrist = copyfrom.zobrist;
         InitBoard();
     }
 
@@ -292,7 +301,7 @@ public class Board
     {
         MoveResult result = new MoveResult();
         result.castlingRights = new CastlingRights();
-        
+
         result.castlingRights.b_ks = castling_bk;
         result.castlingRights.b_qs = castling_bq;
         result.castlingRights.w_ks = castling_wk;
@@ -331,11 +340,14 @@ public class Board
         result.capturedPiece = Squares[move.DestinationSquare];
         result.capture = Squares[move.DestinationSquare] != Piece.None;
         
+        
         //Execute enpassent move
         if (Piece.IsType(movedPiece, Piece.Pawn) &&  (move.StartSquare%8 != move.DestinationSquare%8 ) && Squares[move.DestinationSquare] == Piece.None)
         {
             int offset = GetPieceColor(move.StartSquare) ? 8 : -8;
+            result.capturedPiece = Squares[move.DestinationSquare + offset];
             Squares[move.DestinationSquare + offset] = Piece.None;
+            currentHash ^= zobrist.HashPiece(move.DestinationSquare + offset, result.capturedPiece);
 
             if (turn)
             {
@@ -346,13 +358,9 @@ public class Board
                 blackPieces.Remove(move.DestinationSquare + offset);
             }
             
-            result.capturedPiece = Piece.Pawn + (GetPieceColor(move.StartSquare) ? Piece.White : Piece.Black);
             result.enpassant = true;
             result.capture = true;
         }
-        
-        Squares[move.DestinationSquare] = Squares[move.StartSquare];
-        Squares[move.StartSquare] = Piece.None;
         
         //Detect 2 move
         if (Piece.IsType(Squares[move.DestinationSquare], Piece.Pawn) &&
@@ -360,8 +368,21 @@ public class Board
         {
             result.pawn2squares = true;
         }
+        
+        
+        //ACTUAL MOVING LOGIC STARTS HERE
+        
+        //Set destination square to piece on start square
+        Squares[move.DestinationSquare] = movedPiece;
+        //Only hash out original piece of not enpassant, as we did this earlier
+        if (!result.enpassant) currentHash ^= zobrist.HashPiece(move.DestinationSquare,result.capturedPiece);
+        currentHash ^= zobrist.HashPiece(move.DestinationSquare,movedPiece);
 
-
+        //Remove piece at start square
+        Squares[move.StartSquare] = Piece.None;
+        currentHash ^= zobrist.HashPiece(move.StartSquare, movedPiece);
+        
+        
         //Execute castling
         if (Piece.IsType(Squares[move.DestinationSquare], Piece.King) && (Mathf.Abs(move.StartSquare%8 - move.DestinationSquare%8) > 1) )
         {
@@ -371,16 +392,28 @@ public class Board
                 //Black
                 if (Squares[move.DestinationSquare + 1] != Piece.None)
                 {
+                    //Kingside
+                    //Move the rook
                     Squares[61] = Squares[63];
                     blackPieces.Add(61,Squares[63]);
+                    currentHash ^= zobrist.HashPiece(61, Squares[63]);
+                    
+                    //Remove rook
+                    currentHash ^= zobrist.HashPiece(63, Squares[63]);
                     Squares[63] = Piece.None;
                     blackPieces.Remove(63);
                     result.castle = true;
                 }
                 else
                 {
+                    //Queenside
+                    //Move rook
                     Squares[59] = Squares[56];
                     blackPieces.Add(59,Squares[56]);
+                    currentHash ^= zobrist.HashPiece(59, Squares[56]);
+                    
+                    //Remove rook
+                    currentHash ^= zobrist.HashPiece(56, Squares[56]);
                     Squares[56] = Piece.None;
                     blackPieces.Remove(56);
                     result.castle = true;
@@ -393,6 +426,9 @@ public class Board
                 {
                     Squares[5] = Squares[7];
                     whitePieces.Add(5,Squares[7]);
+                    currentHash ^= zobrist.HashPiece(5, Squares[7]);
+                    
+                    currentHash ^= zobrist.HashPiece(7, Squares[7]);
                     Squares[7] = Piece.None;
                     whitePieces.Remove(7);
                     result.castle = true;
@@ -401,6 +437,9 @@ public class Board
                 {
                     Squares[3] = Squares[0];
                     whitePieces.Add(3, Squares[0]);
+                    currentHash ^= zobrist.HashPiece(3, Squares[0]);
+                    
+                    currentHash ^= zobrist.HashPiece(0, Squares[0]);
                     Squares[0] = Piece.None;
                     whitePieces.Remove(0);
                     result.castle = true;
@@ -428,9 +467,16 @@ public class Board
             }
         }
 
+        //Promotion
         if (move.promotionID != Piece.None)
         {
-            Squares[move.DestinationSquare] = move.promotionID + (turn? Piece.Black : Piece.White);
+            int promotedPiece = move.promotionID + (turn ? Piece.Black : Piece.White);
+
+            currentHash ^= zobrist.HashPiece(move.DestinationSquare, Squares[move.DestinationSquare]);
+            currentHash ^= zobrist.HashPiece(move.DestinationSquare, promotedPiece);
+            
+            Squares[move.DestinationSquare] = promotedPiece;
+            
             if (turn)
             {
                 blackPieces[move.DestinationSquare] = move.promotionID + Piece.Black;
@@ -439,9 +485,23 @@ public class Board
             {
                 whitePieces[move.DestinationSquare] = move.promotionID + Piece.White;
             }
-            
         }
 
+        //For testing position hashing
+        bool hashSuccess = zobrist.HashPosition(this) == currentHash;
+        if (!hashSuccess) Debug.LogError("Hash has failed! FEN: " + GenerateFEN());
+
+        result.resultingHash = currentHash;
+        
+        //Check for draw
+        if (moves.Count > 5)
+        {
+            if (moves[moves.Count - 4].resultingHash == currentHash && moves[moves.Count - 6].resultingHash == moves[moves.Count - 2].resultingHash)
+            {
+                BoardResult = BOARD_DRAW;
+            }
+        }
+        
         //Finally, add move to records and update turn.
         moves.Add(result);
         turn = !turn;
@@ -454,7 +514,7 @@ public class Board
         if (moves.Count == 0) return;
         MoveResult lastMove = moves[moves.Count-1];
 
-        int movedPiece = Squares[lastMove.move.DestinationSquare];
+        int movedPiece = lastMove.movedPiece;
         
         if (turn)
         {
@@ -470,14 +530,17 @@ public class Board
         {
             if (turn)
             {
-                whitePieces.Add(lastMove.move.StartSquare,movedPiece + Piece.White);
+                whitePieces.Add(lastMove.move.StartSquare,movedPiece);
             }
             else
             {
-                blackPieces.Add(lastMove.move.StartSquare,movedPiece + Piece.Black);
+                blackPieces.Add(lastMove.move.StartSquare,movedPiece);
             }
-            
-            Squares[lastMove.move.StartSquare] = Piece.Pawn + (turn ? Piece.White : Piece.Black);
+
+            int originalPawn = Piece.Pawn + (turn ? Piece.White : Piece.Black);
+            Squares[lastMove.move.StartSquare] = originalPawn;
+            currentHash ^= zobrist.HashPiece(lastMove.move.StartSquare, originalPawn);
+            currentHash ^= zobrist.HashPiece(lastMove.move.DestinationSquare, lastMove.move.promotionID + (turn ? Piece.White : Piece.Black));
         }
         else
         {
@@ -489,13 +552,16 @@ public class Board
             {
                 blackPieces.Add(lastMove.move.StartSquare, movedPiece);
             }
-            Squares[lastMove.move.StartSquare] = Squares[lastMove.move.DestinationSquare];
+            currentHash ^= zobrist.HashPiece(lastMove.move.DestinationSquare, movedPiece);
+            currentHash ^= zobrist.HashPiece(lastMove.move.StartSquare, movedPiece);
+            Squares[lastMove.move.StartSquare] = movedPiece;
         }
         
         if (lastMove.enpassant)
         {
             Squares[lastMove.move.DestinationSquare] = Piece.None;
             int offset = GetPieceColor(lastMove.move.StartSquare) ? 8 : -8;
+            currentHash ^= zobrist.HashPiece(lastMove.move.DestinationSquare + offset, lastMove.capturedPiece);
             Squares[lastMove.move.DestinationSquare + offset] = lastMove.capturedPiece;
             if (turn)
             {
@@ -515,6 +581,9 @@ public class Board
                 {
                     Squares[63] = Squares[61];
                     blackPieces.Add(63, Squares[61]);
+                    currentHash ^= zobrist.HashPiece(63, Squares[61]);
+                    
+                    currentHash ^= zobrist.HashPiece(61, Squares[61]);
                     Squares[61] = Piece.None;
                     blackPieces.Remove(61);
                 }
@@ -522,6 +591,9 @@ public class Board
                 {
                     Squares[56] = Squares[59];
                     blackPieces.Add(56, Squares[59]);
+                    currentHash ^= zobrist.HashPiece(56, Squares[59]);
+                    
+                    currentHash ^= zobrist.HashPiece(59, Squares[59]);
                     Squares[59] = Piece.None;
                     blackPieces.Remove(59);
                 }
@@ -534,6 +606,9 @@ public class Board
                 {
                     Squares[7] = Squares[5];
                     whitePieces.Add(7, Squares[5]);
+                    currentHash ^= zobrist.HashPiece(7, Squares[5]);
+                    
+                    currentHash ^= zobrist.HashPiece(5, Squares[5]);
                     Squares[5] = Piece.None;
                     whitePieces.Remove(5);
                 }
@@ -541,15 +616,20 @@ public class Board
                 {
                     Squares[0] = Squares[3];
                     whitePieces.Add(0, Squares[3]);
+                    currentHash ^= zobrist.HashPiece(0, Squares[3]);
+                    
+                    currentHash ^= zobrist.HashPiece(3, Squares[3]);
                     Squares[3] = Piece.None;
                     whitePieces.Remove(3);
                 }
             }
             Squares[lastMove.move.DestinationSquare] = Piece.None;
         }
-        else
+        else //Capture or just simply a move
         {
             Squares[lastMove.move.DestinationSquare] = lastMove.capturedPiece;
+            currentHash ^= zobrist.HashPiece(lastMove.move.DestinationSquare, lastMove.capturedPiece);
+
             if (lastMove.capture)
             {
                 if (turn)
@@ -582,6 +662,8 @@ public class Board
             castling_bq = starting_castling_bq;
             castling_wq = starting_castling_wq;
         }
+
+        BoardResult = BOARD_PROGR;
         
         moves.RemoveAt(moves.Count-1);
         turn = !turn;

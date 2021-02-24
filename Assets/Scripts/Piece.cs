@@ -23,4 +23,9 @@
     {
         return piece & 0b111;
     }
+    
+    public static bool GetPieceColor(int piece)
+    {
+        return (piece & Black) > 0;
+    }
 }

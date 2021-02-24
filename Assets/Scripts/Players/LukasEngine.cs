@@ -128,9 +128,17 @@ public class LukasEngine : Player
             {
                 i++;
                 searchBoard.MakeMove(move);
-                SearchResult result = Search(depthleft - 1, startdepth, alpha, beta, false);
+                SearchResult result;
+                if (searchBoard.BoardResult == Board.BOARD_DRAW)
+                {
+                    result = new SearchResult(0);
+                }
+                else
+                {
+                    result = Search(depthleft - 1, startdepth, alpha, beta, false);
+                }
                 result.move = move;
-
+                
                 if (startdepth - depthleft == 0)
                 {
                     if (!moveEvaluation.ContainsKey(result.move)) moveEvaluation.Add(result.move, result.Eval);
@@ -161,7 +169,15 @@ public class LukasEngine : Player
             {
                 i++;
                 searchBoard.MakeMove(move);
-                SearchResult result = Search(depthleft - 1, startdepth, alpha, beta, true);
+                SearchResult result;
+                if (searchBoard.BoardResult == Board.BOARD_DRAW)
+                {
+                    result = new SearchResult(0);
+                }
+                else
+                {
+                    result = Search(depthleft - 1, startdepth, alpha, beta, true);
+                }
                 result.move = move;
                 
                 if (startdepth - depthleft == 0)

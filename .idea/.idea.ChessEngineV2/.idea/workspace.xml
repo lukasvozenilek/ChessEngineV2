@@ -37,7 +37,6 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/CameraController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameState.cs" />
         <option value="$PROJECT_DIR$/Assets/ChessBoard.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/AIPlayer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Minimax.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/HumanPlayer.cs" />
@@ -62,12 +61,16 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/Players/Minimax.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Players/Player.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameConfiguration.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Move.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluator.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Popup.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PGNCreator.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Piece.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Move.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Zobrist.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
       </list>
     </option>
   </component>
@@ -151,7 +154,8 @@
       <workItem from="1613960917601" duration="1336000" />
       <workItem from="1614024907099" duration="11382000" />
       <workItem from="1614063946374" duration="8426000" />
-      <workItem from="1614100195978" duration="2502000" />
+      <workItem from="1614100195978" duration="3110000" />
+      <workItem from="1614114527048" duration="14477000" />
     </task>
     <servers />
   </component>
@@ -248,9 +252,9 @@
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
     <state x="936" y="250" key="run.anything.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613947234392" />
-    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1614101866968">
+    <state x="943" y="235" width="670" height="58" key="search.everywhere.popup" timestamp="1614135963212">
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
-    <state x="943" y="235" width="672" height="678" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614101866968" />
+    <state x="943" y="235" width="670" height="58" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614135963212" />
   </component>
 </project>

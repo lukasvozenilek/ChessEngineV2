@@ -14,12 +14,12 @@
           <e p="Constants.cs" t="Include" />
           <e p="Evaluator.cs" t="Include" />
           <e p="GameConfiguration.cs" t="Include" />
-          <e p="GameOverWindow.cs" t="Include" />
           <e p="GameState.cs" t="Include" />
           <e p="Move.cs" t="Include" />
           <e p="MoveGenerator.cs" t="Include" />
           <e p="Overlay.cs" t="Include" />
           <e p="PERFT.cs" t="Include" />
+          <e p="PGNCreator.cs" t="Include" />
           <e p="Piece.cs" t="Include" />
           <e p="PieceGO.cs" t="Include" />
           <e p="Players" t="Include">
@@ -30,11 +30,13 @@
             <e p="Random.cs" t="Include" />
             <e p="Stockfish.cs" t="Include" />
           </e>
+          <e p="Popup.cs" t="Include" />
           <e p="PositionWeightTable.cs" t="Include" />
           <e p="SpeedTest.cs" t="Include" />
           <e p="UserInterface.cs" t="Include" />
           <e p="VisualizePositionTables.cs" t="Include" />
           <e p="VisualizePositionTablesEditor.cs" t="Include" />
+          <e p="Zobrist.cs" t="Include" />
         </e>
         <e p="TextMesh Pro" t="Include">
           <e p="Fonts" t="Include">

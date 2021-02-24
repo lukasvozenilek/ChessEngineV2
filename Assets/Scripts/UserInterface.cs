@@ -23,29 +23,47 @@ public class UserInterface : MonoBehaviour
     public TMP_Dropdown player1Diff;
     public TMP_Dropdown player2Diff;
 
+    [Header("Misc")] 
+    public Button generateFenButton;
+    public Button generatePgnButton;
+    
     [Header("Right pane")] 
     [Header("Evaluation")]
     public TMP_Text evaluationText;
 
     [Header("References")]
-    public GameOverWindow gameOverWindowRef;
+    public Popup popupRef;
     public GameObject canvasComponent;
     public void Start()
     {
         //Control objects
         canvasComponent.SetActive(true);
-        gameOverWindowRef.gameObject.SetActive(false);
+        popupRef.gameObject.SetActive(false);
         
         //Subscribe events
         runPerftButton.onClick.AddListener(RunPERFT);
         runSpeedButton.onClick.AddListener(StartSpeedTest);
         newGameButton.onClick.AddListener(StartNewGame);
-        gameOverWindowRef.closeButton.onClick.AddListener(CloseGameResultWindow);
+        popupRef.closeButton.onClick.AddListener(CloseGameResultWindow);
         player1dropdown.onValueChanged.AddListener(OnPlayer1Changed);
         player2dropdown.onValueChanged.AddListener(OnPlayer2Changed);
+        generateFenButton.onClick.AddListener(OnGenerateFEN);
+        generatePgnButton.onClick.AddListener(OnGeneratePGN);
         
         perft = new PERFT();
         speedTest = new SpeedTest();
+        
+        LayoutRebuilder.ForceRebuildLayoutImmediate(gameObject.GetComponent<RectTransform>());
+    }
+
+    public void OnGenerateFEN()
+    {
+        popupRef.ShowPopup("FEN Export", "FEN:", chessBoardRef.board.GenerateFEN());
+    }
+
+    public void OnGeneratePGN()
+    {
+        popupRef.ShowPopup("PGN Export", "PGN:", PGNCreator.CreatePGN(chessBoardRef.board.moves));
     }
 
     public void StartSpeedTest()
@@ -81,7 +99,6 @@ public class UserInterface : MonoBehaviour
 
     public void GameOver(int result)
     {
-        gameOverWindowRef.gameObject.SetActive(true);
         string resultText = "Unknown Result!";
         switch (result)
         {
@@ -95,13 +112,13 @@ public class UserInterface : MonoBehaviour
                 resultText = "Black wins!";
                 break;
         }
-        gameOverWindowRef.outcomeText.text = resultText;
+        popupRef.ShowPopup("Game Over!", resultText);
     }
 
 
     public void CloseGameResultWindow()
     {
-        gameOverWindowRef.gameObject.SetActive(false);
+        popupRef.gameObject.SetActive(false);
     }
     
     public void RunPERFT()

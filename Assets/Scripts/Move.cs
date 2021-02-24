@@ -24,6 +24,7 @@ public struct MoveResult
     public bool castle;
     public bool pawn2squares;
     public CastlingRights castlingRights;
+    public ulong resultingHash;
 }
 
 public struct CastlingRights

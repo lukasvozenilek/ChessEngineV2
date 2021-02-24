@@ -34,6 +34,8 @@ public class ChessBoard : MonoBehaviour
     public bool canMoveBlackPieces;
 
     public UserInterface userInterfaceComponent;
+
+    public Zobrist zobrist = new Zobrist();
     
     void Start()
     {
@@ -248,6 +250,11 @@ public class ChessBoard : MonoBehaviour
             }
             CreateOverlayFromSquares(squareList);
         }
+
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Debug.Log(zobrist.HashPosition(board));
+        }
     }
 
 
@@ -322,6 +329,11 @@ public class ChessBoard : MonoBehaviour
                 }
             }
             pos++;
+        }
+
+        if (board.BoardResult == Board.BOARD_DRAW)
+        {
+            GameOver(Board.BOARD_DRAW);
         }
     }
 
