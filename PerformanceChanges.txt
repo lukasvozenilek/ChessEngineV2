@@ -27,6 +27,9 @@ Fixed alpha pruning:
 Don't know exactly (commit 1560ab7377f2314abd63b425df53aea26c5c570b):
 0.5 seconds (81424 positions)
 
+Exact transposition (just saving evaluation function at depth 0):
+0.39 seconds
 
+Alpha beta transposition:
 
 

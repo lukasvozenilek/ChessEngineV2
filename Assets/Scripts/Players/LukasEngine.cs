@@ -22,6 +22,7 @@ public class LukasEngine : Player
     public int alphaPrunes;
     public int betaPrunes;
     public int movesEvaluated;
+    public int transpositionsFound;
     
     private const float worstEval = -10000;
     public const float bestEval = 10000;
@@ -42,7 +43,7 @@ public class LukasEngine : Player
     public LukasEngine(Board board, int timeLimit) : base(board)
     {
         this.timeLimit = timeLimit;
-        transTable = new TranspositionTable(board, 10000);
+        transTable = new TranspositionTable(board, 1000000);
     }
 
     public override void PlayMove()
@@ -59,7 +60,10 @@ public class LukasEngine : Player
             searchBoard = new Board(board);
             evaluator = new Evaluator(searchBoard);
             InvokeMoveComplete(board.MakeMove(Search(depth, depth, alpha, beta, true).move));
-            Debug.Log(movesEvaluated);
+            Debug.Log("Moves evaluated: " + movesEvaluated);
+            Debug.Log("Alpha prunes: " + alphaPrunes);
+            Debug.Log("Beta prunes: " + betaPrunes);
+            Debug.Log("Transpositions: " + transpositionsFound);
         }, TaskCreationOptions.LongRunning);
     }
 
@@ -95,6 +99,7 @@ public class LukasEngine : Player
         movesEvaluated = 0;
         alpha = worstEval;
         beta = bestEval;
+        transpositionsFound = 0;
     }
 
     public async void WaitForTimeUp()
@@ -113,19 +118,21 @@ public class LukasEngine : Player
             throw new NotSupportedException();
         }
 
-        float value = transTable.GetEvaluation(board.currentHash);
+        float value = transTable.GetEvaluation(searchBoard.currentHash);
         if ((int)value != TranspositionTable.NORESULT)
         {
-            //return new SearchResult(value);
+            transpositionsFound += 1;
+            return new SearchResult(value);
         }
-        
+
+
         //If bottom of depth, return evaluation of position
         if (depthleft == 0)
         {
             movesEvaluated += 1;
-            int perspective = board.turn ? -1 : 1;
+            int perspective = searchBoard.turn ? 1 : -1;
             float evaluation = perspective * evaluator.EvaluateBoard();
-            transTable.StorePosition(board.currentHash, evaluation, TranspositionTable.FLAG_EXACT, startdepth);
+            transTable.StorePosition(searchBoard.currentHash, evaluation, TranspositionTable.FLAG_EXACT, startdepth);
             return new SearchResult(evaluation);
         }
 
