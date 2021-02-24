@@ -18,12 +18,12 @@ public class SpeedTest
     public void RunSpeedtest()
     {
         board = new Board();
-        m_LukasEngine = new LukasEngine(board, 6);
+        m_LukasEngine = new LukasEngine(board, 1000);
         m_LukasEngine.MoveCompleteEvent += LukasEngineDoneCallback;
         Debug.Log("Running speed test");
         currentIteration = 0;
         startTime = Time.realtimeSinceStartup;
-        m_LukasEngine.PlayMove();
+        m_LukasEngine.RunSingleDepthSearch(5);
         TestRunning = true;
         while (TestRunning)
         {

@@ -486,11 +486,7 @@ public class Board
                 whitePieces[move.DestinationSquare] = move.promotionID + Piece.White;
             }
         }
-
-        //For testing position hashing
-        bool hashSuccess = zobrist.HashPosition(this) == currentHash;
-        if (!hashSuccess) Debug.LogError("Hash has failed! FEN: " + GenerateFEN());
-
+        
         result.resultingHash = currentHash;
         
         //Check for draw

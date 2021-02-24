@@ -25,4 +25,7 @@ Legal moves list generated from new list, instead of using .ToList() later:
 Fixed alpha pruning:
 1.4 seconds!!
 
+Not sure what I did exactly:
+0.5 seconds
+
 

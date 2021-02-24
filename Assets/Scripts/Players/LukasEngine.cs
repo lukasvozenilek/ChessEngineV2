@@ -47,6 +47,18 @@ public class LukasEngine : Player
         Task.Factory.StartNew(() => WaitForTimeUp(), TaskCreationOptions.LongRunning);
     }
 
+    public void RunSingleDepthSearch(int depth)
+    {
+        Task.Factory.StartNew(()=>
+        {
+            ResetVars();
+            searchBoard = new Board(board);
+            evaluator = new Evaluator(searchBoard);
+            InvokeMoveComplete(board.MakeMove(Search(depth, depth, alpha, beta, true).move));
+            Debug.Log(movesEvaluated);
+        }, TaskCreationOptions.LongRunning);
+    }
+
     private float alpha;
     private float beta;
     SearchResult upperResult;
@@ -63,8 +75,7 @@ public class LukasEngine : Player
             InvokeMoveComplete(null);
             return;
         }
-
-
+        
         for (int i = 1; i < maxDepth; i++)
         {
             currentDepth = i;
