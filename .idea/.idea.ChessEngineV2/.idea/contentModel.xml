@@ -33,6 +33,7 @@
           <e p="Popup.cs" t="Include" />
           <e p="PositionWeightTable.cs" t="Include" />
           <e p="SpeedTest.cs" t="Include" />
+          <e p="TranspositionTable.cs" t="Include" />
           <e p="UserInterface.cs" t="Include" />
           <e p="VisualizePositionTables.cs" t="Include" />
           <e p="VisualizePositionTablesEditor.cs" t="Include" />

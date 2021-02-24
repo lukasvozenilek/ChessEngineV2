@@ -1,5 +1,4 @@
 Constants
-Algorithm: Minimax
 Position: Starting
 Depth: 5
 Platform: Editor
@@ -25,7 +24,9 @@ Legal moves list generated from new list, instead of using .ToList() later:
 Fixed alpha pruning:
 1.4 seconds!!
 
-Not sure what I did exactly:
-0.5 seconds
+Don't know exactly (commit 1560ab7377f2314abd63b425df53aea26c5c570b):
+0.5 seconds (81424 positions)
+
+
 
 

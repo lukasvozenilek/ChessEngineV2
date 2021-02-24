@@ -36,9 +36,13 @@ public class LukasEngine : Player
     public int maxDepth = 20;
 
     public Board searchBoard;
+
+    public TranspositionTable transTable;
+    
     public LukasEngine(Board board, int timeLimit) : base(board)
     {
         this.timeLimit = timeLimit;
+        transTable = new TranspositionTable(board, 10000);
     }
 
     public override void PlayMove()
@@ -80,7 +84,6 @@ public class LukasEngine : Player
         {
             currentDepth = i;
             upperResult = Search(i, i, alpha, beta, true);
-            //Debug.Log("Depth " + i + " complete. Best move: " + Constants.MoveToString(upperResult.move) + " with eval: " + upperResult.Eval);
         }
     }
 
@@ -103,18 +106,31 @@ public class LukasEngine : Player
 
     private SearchResult Search(int depthleft, int startdepth, float alpha, float beta, bool maximize)
     {
+        //Interrupts search if time is over
         if (TimeLimitReached)
         {
             TimeLimitReached = false;
             throw new NotSupportedException();
         }
+
+        float value = transTable.GetEvaluation(board.currentHash);
+        if ((int)value != TranspositionTable.NORESULT)
+        {
+            //return new SearchResult(value);
+        }
+        
+        //If bottom of depth, return evaluation of position
         if (depthleft == 0)
         {
             movesEvaluated += 1;
             int perspective = board.turn ? -1 : 1;
-            return new SearchResult(perspective * evaluator.EvaluateBoard());
+            float evaluation = perspective * evaluator.EvaluateBoard();
+            transTable.StorePosition(board.currentHash, evaluation, TranspositionTable.FLAG_EXACT, startdepth);
+            return new SearchResult(evaluation);
         }
+
         
+        //Next ensure position has legal moves
         List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(searchBoard));
         int totalMoves = legalMoves.Count;
         if (totalMoves == 0)
@@ -147,6 +163,7 @@ public class LukasEngine : Player
                 else
                 {
                     result = Search(depthleft - 1, startdepth, alpha, beta, false);
+                    
                 }
                 result.move = move;
                 
@@ -188,6 +205,7 @@ public class LukasEngine : Player
                 else
                 {
                     result = Search(depthleft - 1, startdepth, alpha, beta, true);
+                    
                 }
                 result.move = move;
                 

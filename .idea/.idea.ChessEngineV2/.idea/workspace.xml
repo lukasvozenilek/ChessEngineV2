@@ -69,8 +69,9 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Zobrist.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/SpeedTest.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/TranspositionTable.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
       </list>
     </option>
   </component>
@@ -85,6 +86,7 @@
     <property name="Discover.Launch.Via.Unity" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -155,7 +157,7 @@
       <workItem from="1614024907099" duration="11382000" />
       <workItem from="1614063946374" duration="8426000" />
       <workItem from="1614100195978" duration="3110000" />
-      <workItem from="1614114527048" duration="18427000" />
+      <workItem from="1614114527048" duration="22727000" />
     </task>
     <servers />
   </component>
@@ -248,10 +250,10 @@
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
     <state x="781" y="185" key="SettingsEditor/0.0.2560.1080@0.0.2560.1080" timestamp="1613947399299" />
-    <state x="936" y="250" key="run.anything.popup" timestamp="1613947234392">
+    <state x="936" y="250" key="run.anything.popup" timestamp="1614150928207">
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
-    <state x="936" y="250" key="run.anything.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1613947234392" />
+    <state x="936" y="250" key="run.anything.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614150928207" />
     <state x="943" y="235" width="672" height="160" key="search.everywhere.popup" timestamp="1614146792367">
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
