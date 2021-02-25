@@ -10,18 +10,20 @@ public class SpeedTest
     private Board board;
     private LukasEngine m_LukasEngine;
     private const int numberOfTests = 3;
-    private int currentIteration = 0;
     private float startTime;
 
     public bool TestRunning = false;
 
-    public void RunSpeedtest()
+    public SpeedTest()
     {
         board = new Board();
         m_LukasEngine = new LukasEngine(board, 1000);
         m_LukasEngine.MoveCompleteEvent += LukasEngineDoneCallback;
+    }
+
+    public void RunSpeedtest()
+    {
         Debug.Log("Running speed test");
-        currentIteration = 0;
         startTime = Time.realtimeSinceStartup;
         m_LukasEngine.RunSingleDepthSearch(5);
         TestRunning = true;

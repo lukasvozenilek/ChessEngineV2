@@ -36,6 +36,8 @@ public class LukasEngine : Player
 
     public int maxDepth = 20;
 
+    public int maxDepthReached;
+
     public Board searchBoard;
 
     public TranspositionTable transTable;
@@ -43,7 +45,7 @@ public class LukasEngine : Player
     public LukasEngine(Board board, int timeLimit) : base(board)
     {
         this.timeLimit = timeLimit;
-        transTable = new TranspositionTable(board, 1000000);
+        transTable = new TranspositionTable(board, 128000);
     }
 
     public override void PlayMove()
@@ -60,10 +62,7 @@ public class LukasEngine : Player
             searchBoard = new Board(board);
             evaluator = new Evaluator(searchBoard);
             InvokeMoveComplete(board.MakeMove(Search(depth, depth, alpha, beta, true).move));
-            Debug.Log("Moves evaluated: " + movesEvaluated);
-            Debug.Log("Alpha prunes: " + alphaPrunes);
-            Debug.Log("Beta prunes: " + betaPrunes);
-            Debug.Log("Transpositions: " + transpositionsFound);
+            DebugResults();
         }, TaskCreationOptions.LongRunning);
     }
 
@@ -87,6 +86,7 @@ public class LukasEngine : Player
         for (int i = 1; i < maxDepth; i++)
         {
             currentDepth = i;
+            ResetVars();
             upperResult = Search(i, i, alpha, beta, true);
         }
     }
@@ -100,6 +100,9 @@ public class LukasEngine : Player
         alpha = worstEval;
         beta = bestEval;
         transpositionsFound = 0;
+        maxDepthReached = 0;
+        transTable.Clear();
+       
     }
 
     public async void WaitForTimeUp()
@@ -107,33 +110,45 @@ public class LukasEngine : Player
         await Task.Delay(timeLimit);
         TimeLimitReached = true;
         InvokeMoveComplete(board.MakeMove(upperResult.move));
+        DebugResults();
+    }
+
+    public void DebugResults()
+    {
+        Debug.Log("Moves evaluated: " + movesEvaluated);
+        Debug.Log("Alpha prunes: " + alphaPrunes);
+        Debug.Log("Beta prunes: " + betaPrunes);
+        Debug.Log("Transpositions: " + transpositionsFound);
+        Debug.Log("Max depth reached: " + maxDepthReached);
     }
 
     private SearchResult Search(int depthleft, int startdepth, float alpha, float beta, bool maximize)
     {
+        maxDepthReached = Math.Max(maxDepthReached, startdepth - depthleft);
+        
         //Interrupts search if time is over
         if (TimeLimitReached)
         {
             TimeLimitReached = false;
             throw new NotSupportedException();
         }
-
-        float value = transTable.GetEvaluation(searchBoard.currentHash);
+    
+        float value = transTable.GetEvaluation(searchBoard.currentHash, startdepth-depthleft, alpha, beta);
         if ((int)value != TranspositionTable.NORESULT)
         {
             transpositionsFound += 1;
-            return new SearchResult(value);
+            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
+            return new SearchResult(perspective * value);
         }
-
 
         //If bottom of depth, return evaluation of position
         if (depthleft == 0)
         {
             movesEvaluated += 1;
-            int perspective = searchBoard.turn ? 1 : -1;
-            float evaluation = perspective * evaluator.EvaluateBoard();
+            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
+            float evaluation = evaluator.EvaluateBoard();
             transTable.StorePosition(searchBoard.currentHash, evaluation, TranspositionTable.FLAG_EXACT, startdepth);
-            return new SearchResult(evaluation);
+            return new SearchResult(perspective * evaluation);
         }
 
         
@@ -190,11 +205,15 @@ public class LukasEngine : Player
                 {
                     //Beta cutoff
                     betaPrunes += totalMoves - i;
+                    
+                    //transTable.StorePosition(searchBoard.currentHash, 0, TranspositionTable.FLAG_BETA, startdepth-depthleft);
                     searchBoard.UnmakeMove();
                     break;
                 }
                 searchBoard.UnmakeMove();
             }
+            int perspective = (searchBoard.turn ? -1 : 1);
+            transTable.StorePosition(searchBoard.currentHash, perspective * bestResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
             return bestResult;
         }
         else
@@ -232,11 +251,14 @@ public class LukasEngine : Player
                 {
                     //Alpha cutoff
                     alphaPrunes += totalMoves - i;
+                    //transTable.StorePosition(searchBoard.currentHash, 0, TranspositionTable.FLAG_ALPHA, startdepth-depthleft);
                     searchBoard.UnmakeMove();
                     break;
                 }
                 searchBoard.UnmakeMove();
             }
+            int perspective = (searchBoard.turn ? -1 : 1);
+            transTable.StorePosition(searchBoard.currentHash, -perspective * worstResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
             return worstResult;
         }
     }
