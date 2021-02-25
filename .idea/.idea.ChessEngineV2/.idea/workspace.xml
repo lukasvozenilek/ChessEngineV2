@@ -66,12 +66,12 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/Zobrist.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Board.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/SpeedTest.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/TranspositionTable.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluator.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/TranspositionTable.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
       </list>
     </option>
   </component>
@@ -159,7 +159,7 @@
       <workItem from="1614100195978" duration="3110000" />
       <workItem from="1614114527048" duration="22964000" />
       <workItem from="1614186286143" duration="15080000" />
-      <workItem from="1614271577429" duration="7632000" />
+      <workItem from="1614271577429" duration="15635000" />
     </task>
     <servers />
   </component>

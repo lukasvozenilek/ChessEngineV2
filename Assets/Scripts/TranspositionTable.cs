@@ -6,15 +6,15 @@ public class TranspositionTable
     public struct TranspositionEntry
     {
         public ulong key;
-        public int depth;
-        public int flags;
+        public byte depth;
+        public byte flags;
         public float value;
 
-        public TranspositionEntry(ulong key, int depth, int flags, int value)
+        public TranspositionEntry(ulong key, int depth, int flags, float value)
         {
             this.key = key;
-            this.depth = depth;
-            this.flags = flags;
+            this.depth = (byte)depth;
+            this.flags = (byte)flags;
             this.value = value;
         }
     }
@@ -43,13 +43,7 @@ public class TranspositionTable
 
     public void StorePosition(ulong key, float eval, int flag, int depth)
     {
-        TranspositionEntry entry = new TranspositionEntry
-        {
-            key = key, 
-            value = eval, 
-            flags = flag, 
-            depth = depth
-        };
+        TranspositionEntry entry = new TranspositionEntry(key, depth, flag, eval);
         table[key % size] = entry;
     }
 

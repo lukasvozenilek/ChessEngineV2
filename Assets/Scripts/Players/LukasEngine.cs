@@ -70,7 +70,7 @@ public class LukasEngine : Player
     private float alpha;
     private float beta;
     SearchResult upperResult;
-    public void StartDeepeningSearch()
+    private void StartDeepeningSearch()
     {
         ResetVars();
         moveEvaluation.Clear();
@@ -106,10 +106,9 @@ public class LukasEngine : Player
         maxDepthReached = 0;
         checkMatesFound = 0;
         transTable.Clear();
-       
     }
 
-    public async void WaitForTimeUp()
+    private async void WaitForTimeUp()
     {
         await Task.Delay(timeLimit);
         TimeLimitReached = true;
@@ -117,7 +116,7 @@ public class LukasEngine : Player
         DebugResults();
     }
 
-    public void DebugResults()
+    private void DebugResults()
     {
         Debug.Log("Moves evaluated: " + movesEvaluated);
         Debug.Log("Alpha prunes: " + alphaPrunes);
@@ -130,7 +129,7 @@ public class LukasEngine : Player
         {
             Debug.Log(Constants.MoveToString(kvp.Key) + ": " + kvp.Value);
         }
-        Debug.Log("\n\n\n");
+        Debug.Log("\n");
     }
 
     private SearchResult Search(int depthleft, int startdepth, float alpha, float beta, bool maximize)
@@ -162,8 +161,7 @@ public class LukasEngine : Player
             return new SearchResult(perspective * evaluation);
         }
 
-        
-        //Next ensure position has legal moves
+        //Next, ensure position has legal moves
         List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(searchBoard));
         int totalMoves = legalMoves.Count;
         if (totalMoves == 0)
@@ -224,7 +222,7 @@ public class LukasEngine : Player
                 }
                 searchBoard.UnmakeMove();
             }
-            int perspective = (searchBoard.turn ? -1 : 1);
+            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
             transTable.StorePosition(searchBoard.currentHash, perspective * bestResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
             return bestResult;
         }
@@ -243,7 +241,6 @@ public class LukasEngine : Player
                 else
                 {
                     result = Search(depthleft - 1, startdepth, alpha, beta, true);
-                    
                 }
                 result.move = move;
                 
@@ -269,8 +266,8 @@ public class LukasEngine : Player
                 }
                 searchBoard.UnmakeMove();
             }
-            int perspective = (searchBoard.turn ? -1 : 1);
-            transTable.StorePosition(searchBoard.currentHash, -perspective * worstResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
+            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
+            transTable.StorePosition(searchBoard.currentHash, perspective * worstResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
             return worstResult;
         }
     }
