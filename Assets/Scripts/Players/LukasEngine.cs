@@ -23,6 +23,7 @@ public class LukasEngine : Player
     public int betaPrunes;
     public int movesEvaluated;
     public int transpositionsFound;
+    public int checkMatesFound;
     
     private const float worstEval = -10000;
     public const float bestEval = 10000;
@@ -34,7 +35,7 @@ public class LukasEngine : Player
 
     public int currentDepth;
 
-    public int maxDepth = 20;
+    public int maxDepth = 30;
 
     public int maxDepthReached;
 
@@ -72,6 +73,9 @@ public class LukasEngine : Player
     public void StartDeepeningSearch()
     {
         ResetVars();
+        moveEvaluation.Clear();
+        alpha = worstEval;
+        beta = bestEval;
         searchBoard = new Board(board);
         evaluator = new Evaluator(searchBoard);
 
@@ -93,14 +97,14 @@ public class LukasEngine : Player
 
     private void ResetVars()
     {
-        moveEvaluation.Clear();
         alphaPrunes = 0;
         betaPrunes = 0;
         movesEvaluated = 0;
-        alpha = worstEval;
-        beta = bestEval;
+        //alpha = worstEval;
+        //beta = bestEval;
         transpositionsFound = 0;
         maxDepthReached = 0;
+        checkMatesFound = 0;
         transTable.Clear();
        
     }
@@ -120,6 +124,13 @@ public class LukasEngine : Player
         Debug.Log("Beta prunes: " + betaPrunes);
         Debug.Log("Transpositions: " + transpositionsFound);
         Debug.Log("Max depth reached: " + maxDepthReached);
+        Debug.Log("Checkmates found: " + checkMatesFound);
+        Debug.Log("Final move evaluations:");
+        foreach (var kvp in moveEvaluation)
+        {
+            Debug.Log(Constants.MoveToString(kvp.Key) + ": " + kvp.Value);
+        }
+        Debug.Log("\n\n\n");
     }
 
     private SearchResult Search(int depthleft, int startdepth, float alpha, float beta, bool maximize)
@@ -160,6 +171,7 @@ public class LukasEngine : Player
             //If in check, this is checkmate
             if (moveGenerator.checkSquaresBB > 0)
             {
+                checkMatesFound += 1;
                 int perspective = maximize? -1 : 1;
                 //Penalize a checkmate by the depth it's reached to achieve it.
                 return new SearchResult(perspective * ( 5000f - (10 * (startdepth - depthleft))));
@@ -208,7 +220,7 @@ public class LukasEngine : Player
                     
                     //transTable.StorePosition(searchBoard.currentHash, 0, TranspositionTable.FLAG_BETA, startdepth-depthleft);
                     searchBoard.UnmakeMove();
-                    break;
+                    return new SearchResult(beta);
                 }
                 searchBoard.UnmakeMove();
             }
@@ -253,7 +265,7 @@ public class LukasEngine : Player
                     alphaPrunes += totalMoves - i;
                     //transTable.StorePosition(searchBoard.currentHash, 0, TranspositionTable.FLAG_ALPHA, startdepth-depthleft);
                     searchBoard.UnmakeMove();
-                    break;
+                    return new SearchResult(alpha);
                 }
                 searchBoard.UnmakeMove();
             }
@@ -267,19 +279,33 @@ public class LukasEngine : Player
     private void OrderMoves (List<Move> moves)
     {
         int[] moveScores = new int[moves.Count];
-        for (int i = 0; i < moves.Count; i++) {
+        for (int i = 0; i < moves.Count; i++)
+        {
+            Move move = moves[i];
+
             int score = 0;
-            int movePieceType = Piece.GetType(board.Squares[moves[i].StartSquare]);
-            int capturePieceType = Piece.GetType(board.Squares[moves[i].DestinationSquare]);
+            int movePieceType = Piece.GetType(searchBoard.Squares[move.StartSquare]);
+            int capturePieceType = Piece.GetType(searchBoard.Squares[move.DestinationSquare]);
+
+            searchBoard.MakeMove(move);
+            
+            //Exists in transposition table, top priority
+            if (transTable.ContainsPosition(searchBoard.currentHash))
+            {
+                score += 1000;
+            }
+            //Capture
             if (capturePieceType != Piece.None)
             {
-                score = 10;
+                score += 10;
             }
-            else
+            //Previous depth's best move
+            if (move.StartSquare == upperResult.move.StartSquare && move.DestinationSquare == upperResult.move.DestinationSquare)
             {
-                score = 0;
+                score += 100;
             }
             moveScores[i] = score;
+            searchBoard.UnmakeMove();
         }
         Sort (moves, moveScores);
     }

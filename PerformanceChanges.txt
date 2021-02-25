@@ -30,4 +30,9 @@ Don't know exactly (commit 1560ab7377f2314abd63b425df53aea26c5c570b):
 Exact transposition (just saving evaluation function at depth 0):
 0.3 seconds
 
+Alpha+beta and intermediate node exact transposition:
+0.45 seconds
+
+Improved move ordering (last depth best move)
+0.37 seconds
 

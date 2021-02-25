@@ -23,6 +23,11 @@ public class UserInterface : MonoBehaviour
     public TMP_Dropdown player1Diff;
     public TMP_Dropdown player2Diff;
 
+    [Header("Scenarios")] 
+    public Button scen1;
+    public Button scen2;
+    public Button scen3;
+    
     [Header("Misc")] 
     public Button generateFenButton;
     public Button generatePgnButton;
@@ -49,11 +54,27 @@ public class UserInterface : MonoBehaviour
         player2dropdown.onValueChanged.AddListener(OnPlayer2Changed);
         generateFenButton.onClick.AddListener(OnGenerateFEN);
         generatePgnButton.onClick.AddListener(OnGeneratePGN);
+        scen1.onClick.AddListener(StartScenario0);
+        scen2.onClick.AddListener(StartScenario1);
+        scen3.onClick.AddListener(StartScenario2);
         
         perft = new PERFT();
         speedTest = new SpeedTest();
         
         LayoutRebuilder.ForceRebuildLayoutImmediate(gameObject.GetComponent<RectTransform>());
+    }
+
+    public void StartScenario0()
+    {
+        chessBoardRef.StartNewGame(Constants.scenario1);
+    }
+    public void StartScenario1()
+    {
+        //chessBoardRef.StartNewGame(Constants.scenario1);
+    }
+    public void StartScenario2()
+    {
+        //chessBoardRef.StartNewGame(Constants.scenario1);
     }
 
     public void OnGenerateFEN()

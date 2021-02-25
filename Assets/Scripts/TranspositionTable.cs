@@ -53,6 +53,12 @@ public class TranspositionTable
         table[key % size] = entry;
     }
 
+    public bool ContainsPosition(ulong key)
+    {
+        TranspositionEntry entry = table[key % size];
+        return entry.key == key;
+    }
+
     public float GetEvaluation(ulong key, int depth, float alpha, float beta)
     {
         TranspositionEntry entry = table[key % size];
@@ -63,20 +69,19 @@ public class TranspositionTable
                 //If we found an exact position, return the evaluation.
                 case FLAG_EXACT:
                     return entry.value;
+                
                 //If this was an alpha evaluation, use the current alpha.
                 case FLAG_ALPHA:
                     if (entry.value <= alpha)
                         return alpha;
                     break;
+                
                 //If this was an beta evaluation, use the current beta.
                 case FLAG_BETA:
                     if (entry.value >= beta)
-                    {
                         return beta;
-                    }
                     break;
             }
-            return entry.value;
         }
         return NORESULT;
     }

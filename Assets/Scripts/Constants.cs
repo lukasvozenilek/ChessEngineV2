@@ -7,8 +7,16 @@ public static class Constants
     public const string startingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     public const ulong BB_ALL = 0xffffffffffffffff;
     public const ulong BB_NONE = 0;
-    
-    
+
+    public static GameConfiguration scenario1 = new GameConfiguration
+    {
+        player1type = PlayerType.LukasEngine, 
+        player2type =PlayerType.Human,
+        player1Diff = 3,
+        player2Diff = 3,
+        startingFEN = "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1"
+    };
+
     public const int QueenValue = 8;
     public const int PawnValue = 1;
     public const int KnightValue = 3;

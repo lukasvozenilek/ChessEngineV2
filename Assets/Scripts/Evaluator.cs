@@ -49,7 +49,7 @@ public class Evaluator
                 bool isLosing = (pieceColor ? board.whiteMat - board.blackMat : board.blackMat - board.whiteMat) > 0;
                 if (endgame)
                 {
-                    if (isLosing) return Constants.kingTable_endgame[index];
+                    //if (isLosing) return Constants.kingTable_endgame[index];
                     return 0;
                 }
                 return Constants.kingTableScale * Constants.kingTable[index];
