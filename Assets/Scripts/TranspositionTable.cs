@@ -69,13 +69,14 @@ public class TranspositionTable
                     if (entry.value <= alpha)
                         return alpha;
                     break;
-                
+
                 //If this was an beta evaluation, use the current beta.
                 case FLAG_BETA:
                     if (entry.value >= beta)
                         return beta;
                     break;
             }
+            return entry.value;
         }
         return NORESULT;
     }

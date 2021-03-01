@@ -67,11 +67,11 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/SpeedTest.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/ChessBoard.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Evaluator.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/TranspositionTable.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/PieceGO.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/UserInterface.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Constants.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Players/LukasEngine.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/TranspositionTable.cs" />
       </list>
     </option>
   </component>
@@ -161,7 +161,7 @@
       <workItem from="1614186286143" duration="15080000" />
       <workItem from="1614271577429" duration="19035000" />
       <workItem from="1614386171087" duration="855000" />
-      <workItem from="1614633096691" duration="5450000" />
+      <workItem from="1614633096691" duration="6361000" />
     </task>
     <servers />
   </component>
@@ -258,9 +258,9 @@
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
     <state x="936" y="250" key="run.anything.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614150928207" />
-    <state x="943" y="235" width="672" height="160" key="search.everywhere.popup" timestamp="1614637692550">
+    <state x="943" y="235" width="672" height="160" key="search.everywhere.popup" timestamp="1614638613514">
       <screen x="0" y="0" width="2560" height="1080" />
     </state>
-    <state x="943" y="235" width="672" height="160" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614637692550" />
+    <state x="943" y="235" width="672" height="160" key="search.everywhere.popup/0.0.2560.1080@0.0.2560.1080" timestamp="1614638613514" />
   </component>
 </project>

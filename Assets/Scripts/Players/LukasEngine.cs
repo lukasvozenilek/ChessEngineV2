@@ -46,7 +46,7 @@ public class LukasEngine : Player
     public LukasEngine(Board board, int timeLimit) : base(board)
     {
         this.timeLimit = timeLimit;
-        transTable = new TranspositionTable(board, 64000);
+        transTable = new TranspositionTable(board, 256000);
     }
 
     public override void PlayMove()
