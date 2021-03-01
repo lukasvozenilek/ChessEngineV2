@@ -35,10 +35,7 @@ public class PieceGO : MonoBehaviour
         if (!CheckIfCanMove()) return;
         if (chessBoardComponent.board.GetPieceColor(startSquare) == chessBoardComponent.board.turn)
         {
-            List<Move> legalMoves = moveGenerator.GetAllLegalMoves(chessBoardComponent.board).Where(move =>
-            {
-                return move.StartSquare == startSquare; 
-            }).ToList();
+            List<Move> legalMoves = moveGenerator.GetAllLegalMoves(chessBoardComponent.board).Where(move => move.StartSquare == startSquare).ToList();
             chessBoardComponent.CreateOverlayFromMoves(legalMoves);
         }
     }

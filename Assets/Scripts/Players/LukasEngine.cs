@@ -46,7 +46,7 @@ public class LukasEngine : Player
     public LukasEngine(Board board, int timeLimit) : base(board)
     {
         this.timeLimit = timeLimit;
-        transTable = new TranspositionTable(board, 128000);
+        transTable = new TranspositionTable(board, 64000);
     }
 
     public override void PlayMove()
@@ -100,8 +100,8 @@ public class LukasEngine : Player
         alphaPrunes = 0;
         betaPrunes = 0;
         movesEvaluated = 0;
-        //alpha = worstEval;
-        //beta = bestEval;
+        alpha = worstEval;
+        beta = bestEval;
         transpositionsFound = 0;
         maxDepthReached = 0;
         checkMatesFound = 0;
@@ -147,7 +147,7 @@ public class LukasEngine : Player
         if ((int)value != TranspositionTable.NORESULT)
         {
             transpositionsFound += 1;
-            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
+            int perspective = (searchBoard.turn ? -1 : 1) * (maximize? 1 : -1);
             return new SearchResult(perspective * value);
         }
 
@@ -155,7 +155,7 @@ public class LukasEngine : Player
         if (depthleft == 0)
         {
             movesEvaluated += 1;
-            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
+            int perspective = (searchBoard.turn ? -1 : 1) * (maximize? 1 : -1);
             float evaluation = evaluator.EvaluateBoard();
             transTable.StorePosition(searchBoard.currentHash, evaluation, TranspositionTable.FLAG_EXACT, startdepth);
             return new SearchResult(perspective * evaluation);
@@ -180,11 +180,19 @@ public class LukasEngine : Player
 
         int i = 0;
         OrderMoves(legalMoves);
+        if (depthleft == startdepth)
+        {
+            //legalMoves = new List<Move>{new Move(0, 1)}; 
+            //legalMoves = new List<Move>{new Move(0, 9)}; 
+            //legalMoves = new List<Move>{new Move(0, 8)}; 
+        }
         if (maximize)
         {
             SearchResult bestResult = new SearchResult(worstEval);
             foreach (Move move in legalMoves)
             {
+                if (depthleft==startdepth) transTable.Clear();
+
                 i++;
                 searchBoard.MakeMove(move);
                 SearchResult result;
@@ -216,14 +224,13 @@ public class LukasEngine : Player
                     //Beta cutoff
                     betaPrunes += totalMoves - i;
                     
-                    //transTable.StorePosition(searchBoard.currentHash, 0, TranspositionTable.FLAG_BETA, startdepth-depthleft);
+                    transTable.StorePosition(searchBoard.currentHash, beta, TranspositionTable.FLAG_BETA, startdepth-depthleft);
                     searchBoard.UnmakeMove();
                     return new SearchResult(beta);
                 }
                 searchBoard.UnmakeMove();
             }
-            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
-            transTable.StorePosition(searchBoard.currentHash, perspective * bestResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
+            transTable.StorePosition(searchBoard.currentHash, bestResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
             return bestResult;
         }
         else
@@ -260,14 +267,13 @@ public class LukasEngine : Player
                 {
                     //Alpha cutoff
                     alphaPrunes += totalMoves - i;
-                    //transTable.StorePosition(searchBoard.currentHash, 0, TranspositionTable.FLAG_ALPHA, startdepth-depthleft);
+                    transTable.StorePosition(searchBoard.currentHash, alpha, TranspositionTable.FLAG_ALPHA, startdepth-depthleft);
                     searchBoard.UnmakeMove();
                     return new SearchResult(alpha);
                 }
                 searchBoard.UnmakeMove();
             }
-            int perspective = (searchBoard.turn ? 1 : -1) * (maximize? -1 : 1);
-            transTable.StorePosition(searchBoard.currentHash, perspective * worstResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
+            transTable.StorePosition(searchBoard.currentHash, worstResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
             return worstResult;
         }
     }

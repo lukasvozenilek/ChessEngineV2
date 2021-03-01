@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
 
 public class UserInterface : MonoBehaviour
 { 
@@ -31,6 +34,7 @@ public class UserInterface : MonoBehaviour
     [Header("Misc")] 
     public Button generateFenButton;
     public Button generatePgnButton;
+    public Button startMinigame;
     
     [Header("Right pane")] 
     [Header("Evaluation")]
@@ -57,6 +61,7 @@ public class UserInterface : MonoBehaviour
         scen1.onClick.AddListener(StartScenario0);
         scen2.onClick.AddListener(StartScenario1);
         scen3.onClick.AddListener(StartScenario2);
+        startMinigame.onClick.AddListener(StartMinigame);
         
         perft = new PERFT();
         speedTest = new SpeedTest();
@@ -64,6 +69,33 @@ public class UserInterface : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(gameObject.GetComponent<RectTransform>());
     }
 
+    public void StartMinigame()
+    {
+        StartCoroutine(SquaresMiniGame());
+    }
+
+    public IEnumerator SquaresMiniGame ()
+    {
+        while (true)
+        {
+            if (Input.GetMouseButton(0))
+            {
+                Vector3Int cellCoord = chessBoardRef.grid.WorldToCell(GameState.MainCamera.ScreenToWorldPoint(Input.mousePosition));
+                int destinationSquare = (int) (cellCoord.x) + ((int) cellCoord.y * 8);
+                //Check bounds of chess board
+                if (cellCoord.x >= 0 && cellCoord.x <= 7 && cellCoord.y >= 0 && cellCoord.y <= 7)
+                {
+                    Debug.Log(destinationSquare);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            yield return new WaitForSecondsRealtime(0.00001f);
+        }
+    }
+    
     public void StartScenario0()
     {
         chessBoardRef.StartNewGame(Constants.scenario1);

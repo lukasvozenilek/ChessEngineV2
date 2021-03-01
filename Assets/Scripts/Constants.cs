@@ -12,8 +12,8 @@ public static class Constants
     {
         player1type = PlayerType.LukasEngine, 
         player2type =PlayerType.Human,
-        player1Diff = 3,
-        player2Diff = 3,
+        player1Diff = 7,
+        player2Diff = 7,
         startingFEN = "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1"
     };
 
