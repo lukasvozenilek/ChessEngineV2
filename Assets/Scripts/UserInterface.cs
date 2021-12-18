@@ -126,16 +126,16 @@ public class UserInterface : MonoBehaviour
 
     public void OnPlayer1Changed(int val)
     {
-        player1Diff.interactable = (PlayerType) val == PlayerType.LukasEngine;
+        player1Diff.interactable = (Player.PlayerType) val == Player.PlayerType.LukasEngine;
     }
     public void OnPlayer2Changed(int val)
     {
-        player2Diff.interactable = (PlayerType) val == PlayerType.LukasEngine;
+        player2Diff.interactable = (Player.PlayerType) val == Player.PlayerType.LukasEngine;
     }
 
     public void StartNewGame()
     {
-        GameConfiguration config = new GameConfiguration((PlayerType)player1dropdown.value, (PlayerType)player2dropdown.value, player1Diff.value+1, player2Diff.value+1);
+        GameConfiguration config = new GameConfiguration((Player.PlayerType)player1dropdown.value, (Player.PlayerType)player2dropdown.value, player1Diff.value+1, player2Diff.value+1);
         config.startingFEN = String.IsNullOrEmpty(FENInput.text)? Constants.startingFEN : FENInput.text ;
         chessBoardRef.StartNewGame(config);
     }

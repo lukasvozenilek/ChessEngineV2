@@ -67,38 +67,38 @@ public class ChessBoard : MonoBehaviour
 
         switch (gameconfig.player1type)
         {
-            case PlayerType.Human:
+            case Player.PlayerType.Human:
                 whitePlayer = new Players.HumanPlayer(board, this);
                 break;
-            case PlayerType.LukasEngine:
-                whitePlayer = new LukasEngine(board, gameconfig.player1Diff * 2000);
+            case Player.PlayerType.LukasEngine:
+                whitePlayer = new LukasEngine(board, gameconfig.player1Diff * 1000);
                 break;
-            case PlayerType.MonteCarlo:
+            case Player.PlayerType.MonteCarlo:
                 whitePlayer = new MonteCarlo(board);
                 break;
-            case PlayerType.Random:
+            case Player.PlayerType.Random:
                 whitePlayer = new Players.Random(board);
                 break;
-            case PlayerType.Stockfish:
+            case Player.PlayerType.Stockfish:
                 whitePlayer = new Players.Stockfish(board);
                 break;
         }
         
         switch (gameconfig.player2type)
         {
-            case PlayerType.Human:
+            case Player.PlayerType.Human:
                 blackPlayer = new Players.HumanPlayer(board, this);
                 break;
-            case PlayerType.LukasEngine:
-                blackPlayer = new LukasEngine(board, gameconfig.player2Diff * 2000);
+            case Player.PlayerType.LukasEngine:
+                blackPlayer = new LukasEngine(board, gameconfig.player2Diff * 1000);
                 break;
-            case PlayerType.MonteCarlo:
+            case Player.PlayerType.MonteCarlo:
                  whitePlayer = new MonteCarlo(board);
                  break;
-            case PlayerType.Random:
+            case Player.PlayerType.Random:
                 blackPlayer = new Players.Random(board);
                 break;
-            case PlayerType.Stockfish:
+            case Player.PlayerType.Stockfish:
                 blackPlayer = new Players.Stockfish(board);
                 break;
             

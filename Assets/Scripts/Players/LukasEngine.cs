@@ -24,14 +24,15 @@ public class LukasEngine : Player
     public int movesEvaluated;
     public int transpositionsFound;
     public int checkMatesFound;
-    
+
     private const float worstEval = -10000;
     public const float bestEval = 10000;
-    
+
     public Evaluator evaluator;
 
     public int timeLimit;
     public bool TimeLimitReached = false;
+    public bool PlayedMove = false;
 
     public int currentDepth;
 
@@ -42,7 +43,7 @@ public class LukasEngine : Player
     public Board searchBoard;
 
     public TranspositionTable transTable;
-    
+
     public LukasEngine(Board board, int timeLimit) : base(board)
     {
         this.timeLimit = timeLimit;
@@ -57,7 +58,7 @@ public class LukasEngine : Player
 
     public void RunSingleDepthSearch(int depth)
     {
-        Task.Factory.StartNew(()=>
+        Task.Factory.StartNew(() =>
         {
             ResetVars();
             searchBoard = new Board(board);
@@ -70,6 +71,7 @@ public class LukasEngine : Player
     private float alpha;
     private float beta;
     SearchResult upperResult;
+
     private void StartDeepeningSearch()
     {
         ResetVars();
@@ -79,6 +81,8 @@ public class LukasEngine : Player
         searchBoard = new Board(board);
         evaluator = new Evaluator(searchBoard);
 
+        PlayedMove = false;
+
         List<Move> legalMoves = new List<Move>(moveGenerator.GetAllLegalMoves(searchBoard));
         if (legalMoves.Count == 0)
         {
@@ -86,12 +90,19 @@ public class LukasEngine : Player
             InvokeMoveComplete(null);
             return;
         }
-        
+
         for (int i = 1; i < maxDepth; i++)
         {
             currentDepth = i;
             ResetVars();
             upperResult = Search(i, i, alpha, beta, true);
+        }
+
+        if (!PlayedMove)
+        {
+            PlayedMove = true;
+            InvokeMoveComplete(board.MakeMove(upperResult.move));
+            DebugResults();
         }
     }
 
@@ -112,8 +123,12 @@ public class LukasEngine : Player
     {
         await Task.Delay(timeLimit);
         TimeLimitReached = true;
-        InvokeMoveComplete(board.MakeMove(upperResult.move));
-        DebugResults();
+        if (!PlayedMove)
+        {
+            PlayedMove = true;
+            InvokeMoveComplete(board.MakeMove(upperResult.move));
+            DebugResults();
+        }
     }
 
     private void DebugResults()
@@ -129,25 +144,26 @@ public class LukasEngine : Player
         {
             Debug.Log(Constants.MoveToString(kvp.Key) + ": " + kvp.Value);
         }
+
         Debug.Log("\n");
     }
 
     private SearchResult Search(int depthleft, int startdepth, float alpha, float beta, bool maximize)
     {
         maxDepthReached = Math.Max(maxDepthReached, startdepth - depthleft);
-        
+
         //Interrupts search if time is over
         if (TimeLimitReached)
         {
             TimeLimitReached = false;
             throw new NotSupportedException();
         }
-    
-        float value = transTable.GetEvaluation(searchBoard.currentHash, startdepth-depthleft, alpha, beta);
-        if ((int)value != TranspositionTable.NORESULT)
+
+        float value = transTable.GetEvaluation(searchBoard.currentHash, startdepth - depthleft, alpha, beta);
+        if ((int) value != TranspositionTable.NORESULT)
         {
             transpositionsFound += 1;
-            int perspective = (searchBoard.turn ? -1 : 1) * (maximize? 1 : -1);
+            int perspective = (searchBoard.turn ? -1 : 1) * (maximize ? 1 : -1);
             return new SearchResult(perspective * value);
         }
 
@@ -155,7 +171,7 @@ public class LukasEngine : Player
         if (depthleft == 0)
         {
             movesEvaluated += 1;
-            int perspective = (searchBoard.turn ? -1 : 1) * (maximize? 1 : -1);
+            int perspective = (searchBoard.turn ? -1 : 1) * (maximize ? 1 : -1);
             float evaluation = evaluator.EvaluateBoard();
             transTable.StorePosition(searchBoard.currentHash, evaluation, TranspositionTable.FLAG_EXACT, startdepth);
             return new SearchResult(perspective * evaluation);
@@ -170,10 +186,11 @@ public class LukasEngine : Player
             if (moveGenerator.checkSquaresBB > 0)
             {
                 checkMatesFound += 1;
-                int perspective = maximize? -1 : 1;
+                int perspective = maximize ? -1 : 1;
                 //Penalize a checkmate by the depth it's reached to achieve it.
-                return new SearchResult(perspective * ( 5000f - (10 * (startdepth - depthleft))));
+                return new SearchResult(perspective * (5000f - (10 * (startdepth - depthleft))));
             }
+
             //Otherwise, draw due to stalemate
             return new SearchResult(0);
         }
@@ -186,12 +203,13 @@ public class LukasEngine : Player
             //legalMoves = new List<Move>{new Move(0, 9)}; 
             //legalMoves = new List<Move>{new Move(0, 8)}; 
         }
+
         if (maximize)
         {
             SearchResult bestResult = new SearchResult(worstEval);
             foreach (Move move in legalMoves)
             {
-                if (depthleft==startdepth) transTable.Clear();
+                if (depthleft == startdepth) transTable.Clear();
 
                 i++;
                 searchBoard.MakeMove(move);
@@ -203,10 +221,10 @@ public class LukasEngine : Player
                 else
                 {
                     result = Search(depthleft - 1, startdepth, alpha, beta, false);
-                    
                 }
+
                 result.move = move;
-                
+
                 if (startdepth - depthleft == 0)
                 {
                     if (!moveEvaluation.ContainsKey(result.move)) moveEvaluation.Add(result.move, result.Eval);
@@ -217,20 +235,24 @@ public class LukasEngine : Player
                 {
                     bestResult = result;
                 }
-                
+
                 alpha = Math.Max(alpha, result.Eval);
                 if (alpha >= beta)
                 {
                     //Beta cutoff
                     betaPrunes += totalMoves - i;
-                    
-                    transTable.StorePosition(searchBoard.currentHash, beta, TranspositionTable.FLAG_BETA, startdepth-depthleft);
+
+                    transTable.StorePosition(searchBoard.currentHash, beta, TranspositionTable.FLAG_BETA,
+                        startdepth - depthleft);
                     searchBoard.UnmakeMove();
                     return new SearchResult(beta);
                 }
+
                 searchBoard.UnmakeMove();
             }
-            transTable.StorePosition(searchBoard.currentHash, bestResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
+
+            transTable.StorePosition(searchBoard.currentHash, bestResult.Eval, TranspositionTable.FLAG_EXACT,
+                startdepth - depthleft);
             return bestResult;
         }
         else
@@ -249,37 +271,42 @@ public class LukasEngine : Player
                 {
                     result = Search(depthleft - 1, startdepth, alpha, beta, true);
                 }
+
                 result.move = move;
-                
+
                 if (startdepth - depthleft == 0)
                 {
                     if (!moveEvaluation.ContainsKey(result.move)) moveEvaluation.Add(result.move, result.Eval);
                     else moveEvaluation[result.move] = result.Eval;
                 }
-                
+
                 if (result.Eval < worstResult.Eval)
                 {
                     worstResult = result;
                 }
-                
+
                 beta = Math.Min(beta, result.Eval);
                 if (beta <= alpha)
                 {
                     //Alpha cutoff
                     alphaPrunes += totalMoves - i;
-                    transTable.StorePosition(searchBoard.currentHash, alpha, TranspositionTable.FLAG_ALPHA, startdepth-depthleft);
+                    transTable.StorePosition(searchBoard.currentHash, alpha, TranspositionTable.FLAG_ALPHA,
+                        startdepth - depthleft);
                     searchBoard.UnmakeMove();
                     return new SearchResult(alpha);
                 }
+
                 searchBoard.UnmakeMove();
             }
-            transTable.StorePosition(searchBoard.currentHash, worstResult.Eval, TranspositionTable.FLAG_EXACT, startdepth - depthleft);
+
+            transTable.StorePosition(searchBoard.currentHash, worstResult.Eval, TranspositionTable.FLAG_EXACT,
+                startdepth - depthleft);
             return worstResult;
         }
     }
 
     //Right now just sorts based on captures
-    private void OrderMoves (List<Move> moves)
+    private void OrderMoves(List<Move> moves)
     {
         int[] moveScores = new int[moves.Count];
         for (int i = 0; i < moves.Count; i++)
@@ -291,33 +318,42 @@ public class LukasEngine : Player
             int capturePieceType = Piece.GetType(searchBoard.Squares[move.DestinationSquare]);
 
             searchBoard.MakeMove(move);
-            
+
             //Exists in transposition table, top priority
             if (transTable.ContainsPosition(searchBoard.currentHash))
             {
                 score += 1000;
             }
+
             //Capture
             if (capturePieceType != Piece.None)
             {
                 score += 10;
             }
+
             //Previous depth's best move
-            if (move.StartSquare == upperResult.move.StartSquare && move.DestinationSquare == upperResult.move.DestinationSquare)
+            if (move.StartSquare == upperResult.move.StartSquare &&
+                move.DestinationSquare == upperResult.move.DestinationSquare)
             {
                 score += 100;
             }
+
             moveScores[i] = score;
             searchBoard.UnmakeMove();
         }
-        Sort (moves, moveScores);
+
+        Sort(moves, moveScores);
     }
 
-    private void Sort (List<Move> moves, int[] moveScores) {
-        for (int i = 0; i < moves.Count - 1; i++) {
-            for (int j = i + 1; j > 0; j--) {
+    private void Sort(List<Move> moves, int[] moveScores)
+    {
+        for (int i = 0; i < moves.Count - 1; i++)
+        {
+            for (int j = i + 1; j > 0; j--)
+            {
                 int swapIndex = j - 1;
-                if (moveScores[swapIndex] < moveScores[j]) {
+                if (moveScores[swapIndex] < moveScores[j])
+                {
                     (moves[j], moves[swapIndex]) = (moves[swapIndex], moves[j]);
                     (moveScores[j], moveScores[swapIndex]) = (moveScores[swapIndex], moveScores[j]);
                 }
@@ -325,4 +361,3 @@ public class LukasEngine : Player
         }
     }
 }
-

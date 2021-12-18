@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public enum PlayerType
-{
-    Human,
-    LukasEngine,
-    MonteCarlo,
-    Random,
-    Stockfish
-}
-
 public class Player
 {
+    public enum PlayerType
+    {
+        Human,
+        LukasEngine,
+        MonteCarlo,
+        Random,
+        Stockfish
+    }
+    
     public Board board;
     public MoveGenerator moveGenerator;
     public event Action<MoveResult?> MoveCompleteEvent;
